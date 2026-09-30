@@ -1,2 +1,5 @@
-# portfolio
-Professional portfolio of José Andrés Valenzuela Molina — Data &amp; Decision Analytics
+# José Andrés Valenzuela Molina
+
+Professional portfolio — Data & Decision Analytics.
+
+Bilingual English/Spanish portfolio with light/dark themes and downloadable CV.

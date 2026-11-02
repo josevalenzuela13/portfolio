@@ -1,0 +1,1063 @@
+{
+  "modules": [
+    {
+      "id": "F01",
+      "area": "Fundamentos",
+      "title": "Álgebra lineal: geometría de los datos",
+      "pre": "Álgebra escolar",
+      "goals": "Reconocer dimensiones, rango, proyecciones y descomposiciones; conectar geometría con regresión y reducción de dimensión.",
+      "theory": "Una matriz de diseño X de n filas y p columnas representa observaciones y variables. Multiplicar X por un vector de coeficientes transforma parámetros en predicciones. La dimensión importa: Xβ tiene n componentes si β tiene p. El producto interno mide alineación; una norma mide tamaño y permite definir distancias, errores y penalizaciones.\n\nEl rango cuenta direcciones independientes. Si dos columnas son idénticas, no puede identificarse por separado su contribución sin restricciones adicionales. En mínimos cuadrados se proyecta y sobre el espacio generado por X. Las ecuaciones normales describen esa proyección, pero resolverlas con una inversa explícita puede ser numéricamente inestable; QR o SVD ofrecen alternativas.\n\nLa descomposición X=UΣVᵀ separa direcciones y magnitudes. Valores singulares pequeños revelan sensibilidad a perturbaciones. PCA utiliza direcciones de máxima varianza de datos centrados; estandarizar cambia qué variables dominan. Una componente con alta varianza no tiene por qué ser la más predictiva ni causalmente relevante. En datos hospitalarios, unidades y escalas pueden explicar una dirección principal más que un fenómeno clínico.",
+      "formula": "β̂ = arg minβ ‖y − Xβ‖₂²; si X tiene rango columna completo: XᵀXβ̂ = Xᵀy.",
+      "example": "Con X=[[1,0],[1,1],[1,2]] e y=[1,2,3], β=[1,1] produce residuo cero. La primera columna representa el intercepto: la recta es y=1+x. Si se duplica la segunda columna, existen infinitos repartos de la pendiente entre ambas copias.",
+      "pitfall": "Confundir independencia estadística con independencia lineal; invertir matrices casi singulares; aplicar PCA sin justificar las escalas.",
+      "exercise": "Para x=(1,2), z=(2,4), calcula su producto interno, sus normas y si son linealmente independientes.",
+      "solution": "xᵀz=10; ‖x‖=√5; ‖z‖=√20. No son independientes: z=2x. Su similitud coseno es 1, pero eso no establece una relación causal.",
+      "lab": "Construye una regresión sintética con dos columnas casi iguales. Compara coeficientes al perturbar una fila y repite con ridge. Entrega rango, valores singulares, error predictivo y sensibilidad de coeficientes.",
+      "refs": [
+        "mml",
+        "isl"
+      ]
+    },
+    {
+      "id": "F02",
+      "area": "Fundamentos",
+      "title": "Cálculo, optimización y estabilidad numérica",
+      "pre": "F01",
+      "goals": "Derivar pérdidas sencillas; interpretar gradiente y Hessiano; distinguir convergencia de corrección del problema.",
+      "theory": "La derivada expresa cambio local. El gradiente reúne derivadas parciales y apunta hacia el mayor aumento local; su opuesto define una dirección de descenso. La regla de la cadena conecta capas de transformaciones y sustenta la diferenciación automática. El Hessiano describe curvatura: en una función convexa diferenciable, cualquier punto con gradiente cero es un mínimo global, aunque no necesariamente único.\n\nOptimizar no equivale a descubrir la verdad. Un algoritmo puede minimizar una pérdida mal elegida o encontrar una solución que viola restricciones del problema real. Conviene separar función objetivo, dominio factible, algoritmo y criterio de parada. La tolerancia numérica y el número de iteraciones determinan cuándo el programa declara éxito.\n\nLas escalas muy distintas producen superficies mal condicionadas. Normalizar variables y usar cálculos estables puede ser más importante que aumentar iteraciones. En probabilidades pequeñas se trabaja con logaritmos para evitar subdesbordamiento. La función log-sum-exp se calcula restando el máximo antes de exponenciar; esta operación preserva el resultado matemático y mejora su representación finita.",
+      "formula": "θₖ₊₁ = θₖ − η∇L(θₖ). Para L(θ)=(θ−3)², ∇L=2(θ−3).",
+      "example": "Con θ₀=0 y η=0.1, θ₁=0.6 y θ₂=1.08. Con η=1, la secuencia alterna entre 0 y 6: la misma función simple no converge con cualquier paso. Con 0<η<1 sí converge en este ejemplo.",
+      "pitfall": "Interpretar una salida de “éxito” del optimizador como validación científica; usar pasos excesivos; redondear antes de terminar un cálculo.",
+      "exercise": "Calcula el primer paso para L(w)=w²+2w, w₀=2 y η=0.25. Encuentra el mínimo exacto.",
+      "solution": "La derivada es 2w+2=6 en w=2; w₁=0.5. Completando el cuadrado, L=(w+1)²−1: el mínimo está en w=−1.",
+      "lab": "Implementa descenso para una cuadrática bidimensional. Grafica pérdida e iteraciones para tres pasos; verifica derivadas con diferencias finitas y documenta un caso divergente.",
+      "refs": [
+        "mml",
+        "boyd"
+      ]
+    },
+    {
+      "id": "F03",
+      "area": "Fundamentos",
+      "title": "Probabilidad, Bayes e incertidumbre",
+      "pre": "F01",
+      "goals": "Aplicar probabilidad condicional y esperanza; diferenciar incertidumbre sobre resultados y parámetros.",
+      "theory": "Una distribución representa resultados posibles y sus probabilidades. La probabilidad condicional cambia el espacio de referencia: P(A|B) no equivale a P(B|A). Bayes combina una probabilidad previa con la compatibilidad de la evidencia bajo distintas hipótesis. El denominador suma todas las maneras consideradas de producir esa evidencia.\n\nLa esperanza promedia un resultado ponderando sus posibilidades; la varianza cuantifica dispersión alrededor de ella. Una media esperada rentable puede coexistir con pérdidas extremas. Independencia implica factorización de probabilidades, mientras que correlación cero solo descarta cierta dependencia lineal. La covarianza importa al agregar riesgos: la varianza de una suma incluye términos cruzados.\n\nConviene distinguir incertidumbre aleatoria del resultado e incertidumbre epistémica por conocimiento limitado, aunque en la práctica la separación depende del modelo. Una predicción puntual oculta ambas. Simulación, intervalos predictivos y análisis de sensibilidad permiten hacerlas visibles. Una probabilidad calculada solo es tan adecuada como sus supuestos, datos y población de referencia.",
+      "formula": "P(H|E)=P(E|H)P(H)/P(E); Var(X+Y)=Var(X)+Var(Y)+2Cov(X,Y).",
+      "example": "En un ejemplo sintético con prevalencia 1%, sensibilidad 90% y especificidad 95%, 10,000 personas contienen 100 casos: se esperan 90 verdaderos positivos y 495 falsos positivos. El valor predictivo positivo es 90/585=15.38%. Un positivo no implica probabilidad de 90%.",
+      "pitfall": "Ignorar tasas base; tratar dependencia como independencia; confundir intervalo del parámetro con intervalo de una nueva observación.",
+      "exercise": "Repite el cálculo con prevalencia 10%, sensibilidad 90% y especificidad 95%.",
+      "solution": "En 10,000 personas: 900 verdaderos positivos y 450 falsos positivos. P(caso|positivo)=900/1350=66.67%. Cambió la prevalencia, no las propiedades condicionales asumidas del test.",
+      "lab": "Simula una prueba binaria y compara proporciones con Bayes. Repite con tres prevalencias y cuantifica error Monte Carlo. Este ejercicio no evalúa una prueba médica real.",
+      "refs": [
+        "murphy",
+        "mml"
+      ]
+    },
+    {
+      "id": "F04",
+      "area": "Fundamentos",
+      "title": "Inferencia, muestreo y diseño de estudios",
+      "pre": "F03",
+      "goals": "Identificar población, estimando y mecanismo de muestreo; interpretar intervalos, pruebas y potencia.",
+      "theory": "La inferencia intenta aprender sobre una población a partir de observaciones. Primero define el estimando: media, diferencia de riesgos, efecto promedio o precisión futura. Después identifica cómo llegaron los datos. Una muestra enorme puede estimar con mucha precisión una cantidad sesgada si excluye sistemáticamente a parte de la población.\n\nEl error estándar describe variación de un estimador entre muestras, no variabilidad de las personas. Bajo supuestos regulares e independencia, el error estándar de la media decrece como 1/√n. Dependencias por hospital, persona o tiempo reducen la información efectiva. Un intervalo frecuentista de 95% caracteriza la cobertura del procedimiento a largo plazo; no asigna por sí mismo una probabilidad posterior al parámetro fijo.\n\nUn p-valor mide compatibilidad de un estadístico con un modelo nulo, no la probabilidad de que la hipótesis sea cierta. Debe acompañarse de tamaño de efecto, intervalo y relevancia práctica. La potencia depende de efecto, variabilidad, diseño y nivel de prueba. En búsquedas múltiples, seleccionar el resultado más favorable sin ajuste altera el error declarado. El bootstrap requiere un remuestreo coherente con las unidades y dependencias del diseño.",
+      "formula": "EE(x̄)=s/√n bajo observaciones independientes; IC aproximado: x̄ ± 1.96·EE para condiciones asintóticas apropiadas.",
+      "example": "Una media de 100 con s=20 y n=100 tiene EE=2 e intervalo aproximado [96.08,103.92]. Duplicar n no divide el error por dos: para eso se necesitan aproximadamente cuatro veces las observaciones, manteniendo el diseño.",
+      "pitfall": "Equiparar ausencia de significación con equivalencia; ignorar agrupamiento; concluir importancia práctica a partir de p<0.05.",
+      "exercise": "¿Qué EE corresponde a s=12 y n=144? ¿Por qué un millón de registros de un solo hospital no garantiza representatividad nacional?",
+      "solution": "EE=1 bajo independencia. El tamaño no corrige selección de hospital, prácticas locales ni población atendida; además, varias filas pueden pertenecer a la misma persona.",
+      "lab": "Simula 1,000 intervalos para una media conocida y calcula cobertura. Repite tras introducir correlación por grupos y compara bootstrap por filas con bootstrap por grupos.",
+      "refs": [
+        "isl",
+        "murphy"
+      ]
+    },
+    {
+      "id": "F05",
+      "area": "Fundamentos",
+      "title": "Modelos estadísticos: regresión y GLM",
+      "pre": "F01–F04",
+      "goals": "Interpretar coeficientes y supuestos; elegir distribución y enlace; separar asociación, predicción y efecto.",
+      "theory": "La regresión relaciona una respuesta con predictores. En el modelo lineal se modela una media condicional aditiva; los residuos revelan diferencias entre observación y ajuste. La interpretación de un coeficiente depende de qué otras variables se incluyeron, cómo se codificaron y si existen interacciones. Añadir una variable puede cambiar el estimando, no solo mejorar el ajuste.\n\nLos modelos lineales generalizados separan distribución de respuesta, predictor lineal y función de enlace. La regresión logística modela log-odds de un evento; Poisson modela conteos con enlace log y suele requerir revisar dispersión. Si los periodos de exposición difieren, un offset puede representar tiempo o población en riesgo. Una distribución binomial negativa permite dispersión adicional respecto de Poisson.\n\nRegularizar introduce restricciones o penalizaciones para estabilizar estimaciones. Ridge reduce coeficientes continuamente; lasso puede anular algunos. La penalización se elige con datos de entrenamiento y validación, no observando repetidamente el test. Un buen ajuste predictivo no identifica causalidad: ajustar por un mediador o por un collider puede desviar el objetivo causal aunque mejore una métrica.",
+      "formula": "Logística: log[p/(1−p)]=β₀+βᵀx; odds ratio asociado a +1 en xⱼ: exp(βⱼ), manteniendo los demás términos.",
+      "example": "Si β₀=−2 y β₁=0.5, en x=2 el predictor es −1 y p≈0.2689. Un aumento unitario multiplica odds por exp(0.5)≈1.65; no incrementa la probabilidad en 65 puntos porcentuales.",
+      "pitfall": "Confundir odds ratio y riesgo relativo; omitir exposición en conteos; interpretar coeficientes penalizados como efectos causales.",
+      "exercise": "Con predictor logístico igual a cero, ¿cuál es p? Si un conteo Poisson tiene media 4, ¿qué varianza supone el modelo básico?",
+      "solution": "p=0.5. Poisson supone varianza 4 condicional a las covariables; sobredispersión exige revisar modelo, dependencia y heterogeneidad.",
+      "lab": "Ajusta regresión lineal, logística y de conteo a datos sintéticos apropiados. Entrega diagnóstico de residuos, calibración para el modelo binario y evaluación fuera de muestra.",
+      "refs": [
+        "isl",
+        "murphy"
+      ]
+    },
+    {
+      "id": "F06",
+      "area": "Fundamentos",
+      "title": "Causalidad y experimentación",
+      "pre": "F03–F05",
+      "goals": "Definir intervenciones y resultados potenciales; identificar confusión, selección y condiciones de identificación.",
+      "theory": "Una pregunta predictiva pide qué ocurrirá; una causal pregunta qué cambiaría al intervenir. El resultado potencial Y(1) representa lo que ocurriría bajo tratamiento y Y(0) bajo control. Solo uno suele observarse por persona. El efecto promedio requiere comparar mundos mediante un diseño o supuestos que permitan identificarlos.\n\nLa aleatorización rompe, en expectativa, asociaciones del tratamiento con causas previas del resultado. En estudios observacionales, intercambiabilidad condicional, positividad y consistencia permiten ciertas identificaciones, pero no se verifican completamente con una tabla de datos. Un diagrama causal organiza supuestos: ajustar por un confusor puede ayudar; ajustar por un collider puede abrir una asociación espuria; controlar un mediador cambia el efecto que se estima.\n\nEn un experimento define unidad de asignación, intervención, resultado, duración y regla de análisis antes de observar efectos. Interferencia, incumplimiento, abandono y monitoreo repetido requieren tratamiento específico. El efecto por intención de tratar compara grupos asignados y conserva la base del diseño. Un resultado significativo en un segmento seleccionado después de muchas búsquedas necesita validación independiente.",
+      "formula": "ATE=E[Y(1)−Y(0)]. Bajo identificación adecuada: Eₓ{E[Y|A=1,X]−E[Y|A=0,X]}.",
+      "example": "En una simulación aleatorizada, 120 de 1,000 usuarios tratados y 100 de 1,000 controles completan un trámite. La diferencia observada es 2 puntos porcentuales, equivalente a 20% relativo sobre 10%. Sin intervalo y sin revisar el diseño no se declara un beneficio establecido.",
+      "pitfall": "Asignar interpretación causal a una correlación; confundir incremento relativo y absoluto; detener un experimento al primer p-valor favorable.",
+      "exercise": "Un hospital aplica un protocolo a los pacientes más graves. La mortalidad es mayor entre tratados. ¿Prueba que el protocolo causa daño?",
+      "solution": "No. La gravedad influye en asignación y desenlace: hay confusión por indicación. Se necesita diseño o ajuste causal justificable y datos que permitan comparar pacientes relevantes.",
+      "lab": "Dibuja un DAG antes de analizar un efecto sintético. Simula un confusor y un collider; compara ajustes correctos e incorrectos contra el efecto conocido.",
+      "refs": [
+        "whatif"
+      ]
+    },
+    {
+      "id": "F07",
+      "area": "Fundamentos",
+      "title": "Programación, algoritmos y reproducibilidad",
+      "pre": "Python y SQL básicos",
+      "goals": "Convertir una pregunta en funciones verificables; razonar sobre complejidad; producir ejecuciones repetibles.",
+      "theory": "Una solución computacional separa entradas, transformaciones y salidas. Una función pura facilita pruebas porque su resultado depende de argumentos explícitos. Los efectos externos —archivos, reloj, red, estado compartido— se aíslan para poder controlarlos. Los tipos y contratos describen qué valores son válidos; las excepciones deben informar el problema sin ocultarlo.\n\nLa complejidad asintótica compara crecimiento del trabajo, no segundos exactos. Buscar cada elemento de una lista en otra puede costar O(nm); construir un índice hash cambia el patrón esperado, pero consume memoria y depende de suposiciones de implementación. En datos grandes, movimientos de red y disco pueden dominar el cálculo. Perfilar evita optimizar una parte irrelevante.\n\nUna ejecución reproducible registra código, datos o su identificador inmutable, dependencias, configuración y semillas. Fijar una semilla no elimina cambios por bibliotecas, hardware o operaciones paralelas. Git conserva historia de código; no debe recibir secretos ni datos sensibles. Una revisión de código verifica la intención además de la sintaxis. La IA puede asistir, pero quien firma el resultado necesita explicar la lógica, revisar supuestos y comprobar casos adversos.",
+      "formula": "Tiempo total ≈ cómputo + lectura/escritura + comunicación + coordinación; esta descomposición orienta el perfilado.",
+      "example": "Para cruzar 100,000 clientes con 1,000,000 eventos, un doble bucle puede hacer 10¹¹ comparaciones. Un join adecuado utiliza índices, hashing u ordenamiento según motor y datos, evitando ese recorrido ingenuo.",
+      "pitfall": "Un notebook que depende del orden oculto de celdas; capturar toda excepción y devolver cero; guardar credenciales dentro del repositorio.",
+      "exercise": "¿Por qué dos notebooks con la misma semilla pueden dar resultados distintos? Propón cuatro elementos del manifiesto de ejecución.",
+      "solution": "Pueden variar datos, versiones, orden de filas, operaciones paralelas o hardware. El manifiesto debe registrar commit, identificador de datos, entorno de dependencias y configuración, además de semillas cuando correspondan.",
+      "lab": "Convierte un notebook en un script con configuración explícita y funciones de transformación. Ejecútalo desde un entorno limpio y compara resultados; documenta tolerancias para números flotantes.",
+      "refs": [
+        "cmu",
+        "debt"
+      ]
+    },
+    {
+      "id": "F08",
+      "area": "Fundamentos",
+      "title": "Lectura científica y diseño de investigación",
+      "pre": "F04 y F07",
+      "goals": "Formular preguntas investigables; evaluar evidencia y límites; redactar un protocolo reproducible.",
+      "theory": "Un trabajo de posgrado parte de una pregunta delimitada, no de una herramienta de moda. Define población o sistema, intervención o método, comparación y resultado. Una contribución puede ser metodológica, empírica, de replicación o de ingeniería, siempre que explicite qué se aprende y frente a qué referencia.\n\nAl leer un artículo separa afirmación, evidencia y supuesto. Identifica unidad de análisis, datos, partición, baseline, métrica, incertidumbre y restricciones de aplicación. Una mejora promedio puede ocultar fallos por subgrupo o surgir de una comparación mal ajustada. Una ablación retira un componente para comprobar qué aporta; no sustituye una evaluación externa.\n\nUna revisión sistemática necesita protocolo de búsqueda, selección y extracción. PRISMA orienta cómo reportar revisiones; seguir una lista de reporte no garantiza por sí solo validez metodológica. Registra bases, fechas, consultas completas, duplicados y razones de exclusión. La revisión narrativa de este sitio es un mapa educativo; no se presenta como revisión sistemática.\n\nLa ética se traduce en decisiones de diseño: minimizar datos, definir usos permitidos, reconocer límites de consentimiento y registrar conflictos de interés. Reproducibilidad no autoriza divulgar información personal ni materiales sujetos a condiciones de acceso.",
+      "formula": "Pregunta → estimando o criterio → datos → diseño → análisis → incertidumbre → límites → réplica.",
+      "example": "“Usar IA en hospitales” es demasiado amplio. “Comparar un modelo estacional y boosting para ocupación diaria a siete días, con validación temporal y error por hospital” define una evaluación implementable sin afirmar beneficio clínico.",
+      "pitfall": "Confundir revisión de muchos artículos con exhaustividad; reutilizar test para seleccionar modelos; tratar publicación como garantía de ausencia de errores.",
+      "exercise": "Diseña una pregunta para comparar reglas DMN y un optimizador. Especifica comparación justa y dos amenazas a validez.",
+      "solution": "Ambos deben recibir la misma información disponible en el mismo instante y cumplir restricciones equivalentes. Amenazas: políticas históricas que sesgan las etiquetas y costos simulados que no representan el entorno real.",
+      "lab": "Entrega protocolo de dos páginas, matriz de diez lecturas y ficha de amenazas a validez. Incluye una replicación pequeña y un resultado negativo explicado.",
+      "refs": [
+        "prisma",
+        "debt"
+      ]
+    },
+    {
+      "id": "AE01",
+      "area": "Analytics engineering",
+      "title": "Modelo relacional y SQL con semántica explícita",
+      "pre": "F07",
+      "goals": "Razonar sobre claves, cardinalidad, NULL y operaciones relacionales; escribir consultas cuyo resultado tenga significado verificable.",
+      "theory": "El modelo relacional organiza atributos y relaciones; las claves identifican entidades y las restricciones expresan invariantes. Una clave candidata identifica de forma mínima; una primaria es la elegida. Las claves externas controlan referencias. La normalización reduce anomalías de actualización a partir de dependencias funcionales, pero un modelo analítico puede desnormalizar deliberadamente para facilitar consultas.\n\nSQL suele operar con multiconjuntos: los duplicados sobreviven salvo eliminación explícita. Un join multiplica filas cuando hay varias coincidencias. Antes de agregar, especifica la cardinalidad esperada: uno a uno, muchos a uno o muchos a muchos. DISTINCT no repara automáticamente un modelo equivocado, porque puede eliminar eventos legítimos.\n\nNULL representa ausencia o desconocimiento según el contexto y utiliza lógica de tres valores. Comparar x=NULL no equivale a IS NULL; COUNT(*) cuenta filas y COUNT(columna) omite nulos. Un filtro sobre la tabla derecha de un LEFT JOIN colocado en WHERE puede eliminar filas sin correspondencia. Las funciones de ventana calculan sobre particiones sin colapsar filas; su orden y marco deben quedar definidos para evitar acumulados ambiguos.",
+      "formula": "Cardinalidad de un join por clave k: Σₖ n_izq(k)·n_der(k), considerando las claves coincidentes.",
+      "example": "Un cliente con dos pedidos y tres contactos produce seis filas al unir ambas tablas directamente por cliente. Sumar importes duplica cada pedido tres veces. Agregar contactos por cliente antes del join o mantener hechos separados conserva el significado.",
+      "pitfall": "Corregir un fan-out con DISTINCT sin entenderlo; ordenar ventanas con empates no resueltos; reemplazar todos los NULL por cero.",
+      "exercise": "Una factura tiene cuatro líneas y dos pagos. ¿Cuántas filas produce el join directo por factura? ¿Cómo calcular correctamente total facturado y pagado?",
+      "solution": "Ocho filas. Agrega líneas y pagos por factura por separado y une los dos resultados a esa granularidad. Comprueba que el join final sea uno a uno.",
+      "lab": "Crea tablas de clientes, pedidos y pagos con duplicados y ausencias intencionales. Escribe una consulta incorrecta y su corrección; entrega conteos antes/después y restricciones de integridad.",
+      "refs": [
+        "cmu",
+        "kimball"
+      ]
+    },
+    {
+      "id": "AE02",
+      "area": "Analytics engineering",
+      "title": "Modelado dimensional y métricas aditivas",
+      "pre": "AE01",
+      "goals": "Diseñar hechos y dimensiones a una granularidad única; distinguir medidas aditivas, semiaditivas y no aditivas.",
+      "theory": "El diseño dimensional comienza declarando un proceso y el evento representado por cada fila. Una tabla de hechos transaccionales registra eventos; una instantánea periódica registra estados a intervalos; una instantánea acumulativa sigue hitos de un proceso. Elegir una u otra cambia qué preguntas se pueden contestar sin reconstrucciones costosas.\n\nLas dimensiones aportan contexto: quién, qué, dónde y cuándo. Las dimensiones conformadas permiten comparar procesos bajo definiciones compatibles. Las claves sustitutas ayudan a representar versiones históricas, mientras que la clave natural conecta con la fuente. Una dimensión tipo 2 conserva versiones mediante intervalos de vigencia; el hecho debe enlazar a la versión válida en el instante pertinente.\n\nUna medida aditiva puede sumarse por las dimensiones relevantes; un saldo suele ser semiaditivo respecto del tiempo. Un porcentaje es habitualmente no aditivo: se reconstruye desde numerador y denominador compatibles. Las relaciones muchos a muchos requieren un puente o una regla de asignación explícita. No todas las preguntas pueden resolverse con una única tabla ancha sin introducir duplicaciones o mezclar eventos.",
+      "formula": "Tasa agregada = Σ numeradores / Σ denominadores; no, en general, promedio simple de tasas.",
+      "example": "Una sucursal convierte 1 de 10 y otra 90 de 100. Sus tasas son 10% y 90%; el promedio simple da 50%, pero la conversión global es 91/110=82.73%. Los tamaños explican la diferencia.",
+      "pitfall": "Sumar saldos diarios como ingreso; mezclar cliente y transacción; reemplazar historia de dimensión cuando se requiere análisis retrospectivo.",
+      "exercise": "Una cuenta tiene saldos 100, 120 y 80 en tres días. ¿El saldo del periodo es 300? ¿Qué métricas alternativas tienen sentido?",
+      "solution": "300 no representa un saldo de cierre. Según la pregunta pueden usarse cierre 80, saldo promedio 100 o saldo máximo 120. La definición debe explicitar calendario, hora de corte y tratamiento de días sin dato.",
+      "lab": "Diseña un esquema estrella de hospital con episodio, procedimiento y facturación como hechos separados. Declara grano, claves, dimensiones conformadas y tres consultas de reconciliación.",
+      "refs": [
+        "kimball"
+      ]
+    },
+    {
+      "id": "AE03",
+      "area": "Analytics engineering",
+      "title": "Tiempo, CDC y transformaciones incrementales",
+      "pre": "AE01–AE02",
+      "goals": "Preservar historia y correcciones; diseñar reejecuciones idempotentes y cargas incrementales comparables con una reconstrucción completa.",
+      "theory": "Los datos tienen varios relojes: momento del evento, registro en origen, recepción y procesamiento. El instante en que un hecho ocurrió no coincide necesariamente con aquel en que pudo conocerse. Esta distinción es esencial para auditoría y para construir features que no utilicen información futura.\n\nUna carga incremental procesa cambios desde un punto de control. Filtrar únicamente por fecha del evento puede perder correcciones antiguas o llegadas tardías. CDC captura inserciones, actualizaciones y eliminaciones, pero todavía exige interpretar operaciones, versiones y orden. Un watermark es una política operativa sobre avance o tardanza; no garantiza que nunca aparezcan datos posteriores a ese límite.\n\nIdempotencia significa que reejecutar el mismo lote no altera indebidamente el resultado. Requiere claves estables, deduplicación y reglas de actualización deterministas. Para análisis bitemporal se representan tiempo de validez del negocio y tiempo de conocimiento del sistema. Los backfills deben convivir con procesos corrientes sin sobrescribir una versión más reciente. Comparar periódicamente contra una reconstrucción completa detecta acumulación de errores.",
+      "formula": "Idempotencia: T(T(D,b),b)=T(D,b), donde D es estado, b lote y T transformación.",
+      "example": "Una venta ocurrió el lunes, llegó el miércoles y fue anulada el viernes. Un tablero “tal como se sabía el martes” no debe incluirla; un tablero corregido del lunes puede excluirla tras la anulación. Son preguntas diferentes y requieren historia suficiente.",
+      "pitfall": "Usar timestamp del evento como único cursor; ignorar borrados; hacer append de un lote repetido sin clave de deduplicación.",
+      "exercise": "Un lote tiene evento A versión 1 y versión 2; el siguiente reenvía versión 1. ¿Qué regla evita volver a un estado antiguo?",
+      "solution": "Actualizar solo si la versión entrante es posterior a la vigente, con desempate definido. La comparación necesita una versión u orden confiable del origen; el orden de llegada no siempre basta.",
+      "lab": "Simula lotes desordenados, duplicados, actualizaciones y borrados. Demuestra igualdad entre carga incremental y reconstrucción completa para el mismo corte de conocimiento.",
+      "refs": [
+        "ddia",
+        "spark"
+      ]
+    },
+    {
+      "id": "AE04",
+      "area": "Analytics engineering",
+      "title": "Sistemas distribuidos y garantías de procesamiento",
+      "pre": "F07 y AE03",
+      "goals": "Analizar particiones, replicación y fallos; explicar las garantías reales de un pipeline de extremo a extremo.",
+      "theory": "Distribuir datos aumenta capacidad, pero introduce comunicación, coordinación y fallos parciales. El particionado decide dónde vive cada subconjunto; la replicación mantiene copias para disponibilidad o lectura. Una partición de red impide que ciertos nodos se comuniquen, aunque otros continúen trabajando. La elección de consistencia y disponibilidad se evalúa bajo esos escenarios, no como eslogan de arquitectura.\n\nUna transacción atómica agrupa cambios que se confirman o revierten juntos. El aislamiento regula qué interacciones concurrentes pueden observarse; diferentes niveles permiten anomalías diferentes. Una fotografía consistente sirve para ciertos análisis, pero no elimina por sí sola conflictos de escritura o decisiones basadas en datos obsoletos.\n\n“At least once” admite repeticiones; “at most once” puede perder trabajo al fallar; “exactly once” solo tiene significado dentro de un alcance y bajo condiciones concretas. Si un cálculo y una llamada externa no comparten transacción, confirmar uno y perder el otro crea discrepancias. Claves de idempotencia, tablas outbox, confirmaciones y reconciliación ayudan a diseñar una semántica de negocio robusta. El comportamiento bajo recuperación forma parte del producto.",
+      "formula": "Garantía de negocio = captura + transporte + cálculo + escritura + efectos externos + recuperación; una garantía local no cubre automáticamente toda la cadena.",
+      "example": "El consumidor escribe una decisión y falla antes de confirmar el mensaje. Al reiniciar lo recibe otra vez. Si la salida usa request_id como clave única y verifica contenido, el segundo intento no crea una segunda decisión efectiva.",
+      "pitfall": "Decir “exactly once” porque una herramienta lo anuncia; asumir que dos bases comparten atomicidad; ignorar mensajes venenosos y colas de errores.",
+      "exercise": "Un servicio cobra una comisión y luego guarda el resultado. ¿Qué ocurre si falla entre ambos pasos? Propón una mitigación.",
+      "solution": "El reintento puede cobrar dos veces o dejar un cobro sin registro. Una clave idempotente aceptada por el proveedor y una reconciliación de estados reducen el riesgo; una transacción local no controla el sistema remoto.",
+      "lab": "Diseña una matriz de fallos antes/después de lectura, escritura y confirmación. Implementa una simulación con duplicados y verifica invariantes de negocio tras cada recuperación.",
+      "refs": [
+        "ddia",
+        "cmu"
+      ]
+    },
+    {
+      "id": "AE05",
+      "area": "Analytics engineering",
+      "title": "Calidad, contratos y linaje de datos",
+      "pre": "AE01–AE04",
+      "goals": "Convertir expectativas de negocio en pruebas; distinguir completitud, exactitud y oportunidad; rastrear impacto de cambios.",
+      "theory": "La calidad depende del uso. Una tabla puede ser completa en filas y equivocada en unidades; una medición exacta puede llegar demasiado tarde. Conviene definir dimensiones observables: unicidad, integridad referencial, dominios, completitud, consistencia, oportunidad y exactitud respecto de evidencia externa.\n\nUn contrato describe estructura y semántica: tipos, unidades, claves, significado de estados, frecuencia, responsable y política de cambios. Los tests de esquema detectan rupturas sintácticas; los de negocio verifican invariantes. Para detectar problemas silenciosos hacen falta reconciliación con fuentes, distribuciones históricas y controles de relaciones entre variables. Un test que reproduce exactamente el mismo cálculo puede compartir su error.\n\nEl linaje registra dependencias entre fuente, transformación, tabla, métrica y consumo. Ayuda a estimar impacto, pero no demuestra que la lógica sea correcta. Los objetivos de servicio deben especificar umbrales y ventanas, por ejemplo disponibilidad de datos antes de un corte, con tratamiento de incidentes. Las alertas necesitan propietario y acción: observar cien anomalías diarias sin respuesta no aporta control efectivo.",
+      "formula": "Completitud de campo = valores presentes / registros elegibles; integridad referencial = referencias válidas / referencias que deberían existir.",
+      "example": "Se esperan 1,000 operaciones y llegan 1,000, pero 50 identificadores están repetidos y faltan otros 50. El conteo global pasa; una reconciliación por clave falla. La cobertura y la unicidad detectan problemas diferentes.",
+      "pitfall": "Confundir no nulo con correcto; fijar umbrales sin baseline; registrar linaje técnico sin significado de las métricas.",
+      "exercise": "Una tabla cumple unicidad y tipos, pero registra importes en centavos como si fueran euros. ¿Qué controles pueden descubrirlo?",
+      "solution": "Contrato de unidades, comparación de magnitudes históricas, reconciliación contable y límites plausibles por tipo de transacción. Un test de tipo numérico no distingue unidades.",
+      "lab": "Escribe un contrato de producto de datos y diez controles de valor independiente. Inyecta cinco fallos distintos y registra qué control los detecta y qué errores permanecen posibles.",
+      "refs": [
+        "kimball",
+        "fair",
+        "ddia"
+      ]
+    },
+    {
+      "id": "AE06",
+      "area": "Analytics engineering",
+      "title": "Capa semántica, métricas y consistencia temporal",
+      "pre": "AE02 y AE05",
+      "goals": "Definir indicadores reproducibles; evitar sesgos por población, denominador y calendario; conectar métricas a decisiones.",
+      "theory": "Una métrica necesita más que una fórmula: población elegible, unidad de observación, ventana, evento de inclusión, exclusiones, tratamiento de reversos y fuente. “Usuarios activos” puede referirse a acceso, compra o transferencia; ninguna definición es universal. Las diferencias deben resolverse con responsables del proceso y consumidores.\n\nLas métricas de flujo cuentan eventos durante un intervalo; las de stock describen estado en un corte. Los embudos requieren ordenar eventos y decidir si la unidad es persona, sesión o solicitud. Las cohortes fijan un origen temporal común, mientras que una mezcla de antigüedades puede confundir maduración y desempeño. Las conversiones deben usar denominadores compatibles con la oportunidad de convertir.\n\nUna capa semántica centraliza definiciones y relaciones autorizadas para reducir divergencias. No reemplaza discusión conceptual ni elimina sesgos del origen. Los cambios de definición requieren versionado y puentes de comparación. Vincular un KPI a un incentivo puede provocar adaptación del comportamiento: mejorar la cifra no garantiza mejorar el objetivo. Por eso conviene acompañar indicadores de resultado con restricciones y métricas de efectos secundarios.",
+      "formula": "Conversión de cohorte = entidades que alcanzan el evento dentro de Δ / entidades elegibles al inicio; Δ y elegibilidad son parte de la definición.",
+      "example": "Una cohorte del lunes tiene siete días de seguimiento y la del domingo solo uno. Comparar conversión acumulada directamente puede atribuir al producto una diferencia causada por maduración.",
+      "pitfall": "Mezclar fecha local y UTC sin corte definido; promediar ratios sin ponderación; cambiar definición histórica sin informar.",
+      "exercise": "Define morosidad a 30 días para una cartera sintética. ¿Qué fechas y denominadores necesitas fijar antes de calcular?",
+      "solution": "Debe aclararse si se mide saldo o cuentas, fecha de corte, días vencidos, operaciones elegibles, refinanciamientos, castigos, reversos y moneda. Distintas definiciones contestan preguntas distintas.",
+      "lab": "Construye un diccionario de diez KPI con versión y pruebas. Implementa tres consultas de referencia y demuestra que dos visualizaciones producen el mismo resultado al mismo corte.",
+      "refs": [
+        "kimball",
+        "analyticsbook"
+      ]
+    },
+    {
+      "id": "AE07",
+      "area": "Analytics engineering",
+      "title": "Rendimiento, streaming y costo operativo",
+      "pre": "AE01 y AE04",
+      "goals": "Leer planes de ejecución; escoger estrategias según carga; balancear latencia, exactitud y costo.",
+      "theory": "Una consulta declarativa se transforma en un plan físico: escaneos, filtros, joins, agregaciones y movimientos de datos. Reducir columnas y filas pronto puede disminuir trabajo; índices, particiones y clustering sirven a patrones concretos. Un particionado excesivo produce archivos pequeños y coordinación; uno inadecuado impide podar lecturas.\n\nEn sistemas distribuidos, un shuffle redistribuye registros por clave y puede dominar el costo. Una clave muy frecuente genera sesgo: una partición recibe mucho más trabajo. Broadcast puede evitar ciertos movimientos si una relación es suficientemente pequeña, pero no debe asumirse sin revisar memoria y motor. Materializar cálculos reduce latencia de lectura a cambio de almacenamiento, cómputo de mantenimiento y posible obsolescencia.\n\nEn streaming se distingue tiempo del evento y tiempo de procesamiento. Ventanas tumbling no se solapan; sliding sí; session agrupa periodos de actividad definidos por una pausa. La política de llegadas tardías determina si se corrigen salidas o se descartan eventos. La baja latencia debe justificarse por la decisión que habilita: una actualización cada segundo puede costar mucho sin cambiar una acción diaria.",
+      "formula": "Costo útil por decisión ≈ (cómputo + almacenamiento + transferencia + operación) / decisiones efectivamente apoyadas.",
+      "example": "Agregar por cliente obliga a reunir eventos del mismo cliente. Si uno concentra 40% del tráfico, repartir por hash de cliente no reparte la carga uniformemente. El remedio depende de si la agregación permite descomposición y combinación posterior.",
+      "pitfall": "Optimizar por tiempo de una ejecución aislada; cachear sin política de invalidez; llamar “tiempo real” a cualquier refresco frecuente.",
+      "exercise": "Una métrica se decide semanalmente. ¿Qué evidencia pedirías antes de migrar un batch nocturno a streaming?",
+      "solution": "Cuantificar costo de información tardía, necesidad de reaccionar antes del siguiente lote, volumen y costo de operación; definir latencia objetivo y comprobar que cambia decisiones o resultados.",
+      "lab": "Compara un plan con y sin filtro temprano y un agregado precomputado. Registra tamaño leído, tiempo, costo estimado y frescura; explica dónde no se generaliza el resultado.",
+      "refs": [
+        "spark",
+        "ddia",
+        "cmu"
+      ]
+    },
+    {
+      "id": "AE08",
+      "area": "Analytics engineering",
+      "title": "Arquitectura, CI/CD y gobierno de productos de datos",
+      "pre": "AE01–AE07",
+      "goals": "Construir un producto mantenible; evaluar warehouse/lakehouse sin dogmas; desplegar cambios compatibles y observables.",
+      "theory": "Una arquitectura responde a necesidades de acceso, volumen, latencia, consistencia y organización. Warehouse, lake y lakehouse describen patrones que pueden solaparse; elegir por nombre oculta decisiones sobre formato, catálogo, transacciones, motores, seguridad y costos. Documenta alternativas y razones en registros de decisión arquitectónica.\n\nLas capas de datos separan captura fiel, normalización y consumo, pero más capas no garantizan mejor diseño. Una unidad útil tiene propietario, contrato, consumidores y ciclo de vida. La modularidad evita que cambiar un cálculo obligue a reinterpretar todos los reportes. El gobierno define responsabilidad y acceso; el mínimo privilegio y la separación de entornos reducen exposición accidental.\n\nCI verifica cambios con análisis estático y controles relevantes; CD promueve una versión bajo condiciones definidas. Cambiar una columna utilizada por varios consumidores exige deprecación, compatibilidad o migración coordinada. Un despliegue reversible necesita un plan de datos: revertir código no deshace necesariamente una escritura. La observabilidad cubre salud de ejecución, frescura, calidad y consecuencias en consumidores. El mantenimiento y la recuperación son parte del costo del producto.",
+      "formula": "Producto de datos = conjunto de datos + contrato + responsables + controles + acceso + operación + documentación.",
+      "example": "Renombrar “monto” a “importe” rompe un dashboard aunque la transformación pase sus pruebas internas. Mantener temporalmente un alias, avisar consumidores y medir uso permite una migración observable.",
+      "pitfall": "Confundir catálogo con gobierno efectivo; diseñar una plataforma antes de identificar consumidores; revertir código ignorando datos ya modificados.",
+      "exercise": "Diseña criterios de aceptación para un mart crediticio: al menos dos semánticos, dos operativos y uno de compatibilidad.",
+      "solution": "Ejemplos: grano cuenta-corte y definición de vencimiento; frescura antes del corte y recuperación tras fallo; compatibilidad con columnas y tipos consumidos en la versión vigente. Cada criterio necesita evidencia verificable.",
+      "lab": "Proyecto AE: entrega repositorio con esquema estrella, incremental idempotente, contrato, controles, documentación y plan de recuperación. Compara al menos dos opciones arquitectónicas y justifica la elegida.",
+      "refs": [
+        "ddia",
+        "lakehouse",
+        "analyticsbook"
+      ]
+    },
+    {
+      "id": "DE01",
+      "area": "Decision engineering",
+      "title": "Diseñar decisiones: objetivos, utilidad y restricciones",
+      "pre": "F03–F06",
+      "goals": "Formalizar una decisión antes de programarla; diferenciar utilidad, predicción y restricciones no negociables.",
+      "theory": "Una decisión necesita un responsable, alternativas factibles, información disponible, horizonte y consecuencias. Modelar primero la acción evita confundir un score con una política: la misma predicción puede conducir a acciones diferentes según costos, capacidad y objetivos. Las restricciones duras definen acciones prohibidas o inviables; una penalización blanda permite intercambios y por tanto no sustituye automáticamente una prohibición.\n\nLa utilidad representa preferencias sobre consecuencias. Si el decisor es neutral al riesgo monetario, puede utilizar valor esperado; si valora de forma distinta pérdidas y ganancias o enfrenta límites de capital, necesita una representación más rica. Una función de utilidad no es una verdad objetiva: sus supuestos y responsables deben ser explícitos.\n\nCon múltiples objetivos, una suma ponderada hace comparables dimensiones mediante elecciones de escala y pesos. La frontera de Pareto contiene alternativas no dominadas: mejorar un objetivo exige empeorar otro dentro del conjunto considerado. No todas sus alternativas son aceptables ética u operativamente. La sensibilidad a pesos, escenarios y costos revela qué decisiones son robustas y cuáles dependen de supuestos frágiles.",
+      "formula": "a*(x)=arg maxₐ∈A(x) Σᵧ U(a,y)P(y|x); si a cambia y, usar un modelo interventional apropiado, no asumir P(y|x) invariable.",
+      "example": "Crédito sintético: ganancia 100 si paga, pérdida 900 si incumple y cero al rechazar. Con probabilidad p de incumplimiento, utilidad esperada=100−1000p; aprobar tiene valor positivo si p<0.10. El umbral cambia si cambian costos o restricciones.",
+      "pitfall": "Optimizar accuracy en lugar de utilidad; convertir una restricción dura en costo arbitrario; ignorar que una acción altera el resultado.",
+      "exercise": "Con ganancia 80 y pérdida 320, calcula el umbral de incumplimiento bajo el mismo modelo simplificado.",
+      "solution": "80(1−p)−320p=80−400p. Aprobar supera cero si p<0.20; en p=0.20 hay indiferencia bajo estos únicos supuestos.",
+      "lab": "Construye una ficha de decisión para un límite de crédito sintético: acciones, datos al corte, restricciones, utilidad y escenarios. Incluye una alternativa de no actuar.",
+      "refs": [
+        "howard",
+        "bertsimas"
+      ]
+    },
+    {
+      "id": "DE02",
+      "area": "Decision engineering",
+      "title": "Decisión bayesiana y valor de la información",
+      "pre": "F03 y DE01",
+      "goals": "Distinguir mejora predictiva de valor decisional; calcular cuánto pagar por información perfecta o parcial.",
+      "theory": "La información es valiosa si puede cambiar una acción de manera que mejore su utilidad esperada, descontando el costo de obtenerla. Un dato puede predecir mejor y tener valor decisional nulo si todas las acciones siguen siendo iguales. La decisión bayesiana combina incertidumbre con una función de pérdida explícita.\n\nEl valor esperado de información perfecta compara la mejor acción después de conocer el estado con la mejor acción usando solo la distribución previa. Es una cota superior para el valor bruto de información imperfecta sobre ese mismo estado y conjunto de acciones. La información muestral utiliza una distribución de señales y una actualización posterior; se promedia el beneficio de las decisiones adaptadas a cada señal.\n\nEl análisis debe incluir demora, costo de adquisición y posibilidad de resultados no concluyentes. Si una revisión humana reduce incertidumbre pero retrasa una decisión urgente, el costo temporal importa. Un árbol de decisión distingue nodos de azar y de elección; resolverlo hacia atrás evita elegir una política antes de aprovechar información que sí estará disponible. La calidad del resultado depende de la coherencia de probabilidades, utilidades y supuestos de actualización.",
+      "formula": "EVPI=Eω[maxₐ U(a,ω)]−maxₐ Eω[U(a,ω)] ≥ 0 en el modelo clásico sin costo de información.",
+      "example": "Una inversión gana 100 con probabilidad 0.6 y pierde 80 con 0.4; no invertir da 0. Sin información se elige invertir: valor 28. Con estado perfecto se invierte solo en el favorable: valor 60. EVPI=32, antes de costos.",
+      "pitfall": "Pagar por una mejora de AUC sin comprobar decisiones; confundir información perfecta con un test de sensibilidad alta; ignorar tiempos de respuesta.",
+      "exercise": "En el ejemplo, ¿pagar 40 por información perfecta puede ser óptimo? ¿Qué ocurre con información que nunca cambia la acción?",
+      "solution": "No: su valor bruto máximo es 32 bajo el modelo. Si nunca cambia la acción y no tiene otros beneficios, su valor decisional bruto es cero.",
+      "lab": "Diseña un árbol con dos acciones, dos estados y una señal imperfecta. Calcula posteriores, política por señal y valor neto; comprueba que el valor bruto no exceda EVPI.",
+      "refs": [
+        "howard",
+        "murphy"
+      ]
+    },
+    {
+      "id": "DE03",
+      "area": "Decision engineering",
+      "title": "Programación lineal, entera y sensibilidad",
+      "pre": "F01–F02 y DE01",
+      "goals": "Traducir restricciones a ecuaciones; resolver problemas pequeños; interpretar factibilidad, óptimo y relajación.",
+      "theory": "Un modelo de optimización especifica variables de decisión, objetivo y restricciones. La programación lineal utiliza expresiones lineales y variables continuas; un modelo entero representa decisiones indivisibles o lógicas. El primer trabajo difícil suele ser formular correctamente: unidades incompatibles o restricciones ausentes pueden producir un óptimo absurdo.\n\nLa región factible contiene soluciones permitidas. Un problema puede ser infactible, no acotado o tener múltiples óptimos. Una solución de un solver requiere revisar estado, tolerancias y residuales antes de usarse. En MILP, branch-and-bound compara cotas de relajaciones con soluciones enteras encontradas. Una brecha de optimalidad mide diferencia certificada bajo la formulación, no error de los supuestos del negocio.\n\nLa dualidad conecta restricciones con precios marginales en condiciones apropiadas. Un precio sombra es local y depende del rango donde la estructura óptima se conserva; no autoriza extrapolación ilimitada. Los modelos con términos big-M necesitan cotas justificadas: valores excesivos pueden debilitar relajaciones y empeorar estabilidad. Restricciones lógicas deben verificarse con casos pequeños antes de escalar.",
+      "formula": "max 3x+2y, sujeto a x+y≤4, x≤2, x≥0, y≥0. Si x,y son enteros, se añade esa condición explícita.",
+      "example": "En el problema anterior, cada unidad de x aporta más que y y utiliza la misma capacidad. La solución es x=2,y=2 con valor 10. Los vértices (0,0),(2,0),(2,2),(0,4) permiten comprobarlo manualmente.",
+      "pitfall": "Confundir una solución factible con una óptima; redondear un óptimo continuo sin verificar restricciones; interpretar precios sombra fuera de su rango.",
+      "exercise": "¿Qué pasa si se agrega x+y≥5 al ejemplo? ¿Y si se retira x+y≤4 pero se mantiene x≤2?",
+      "solution": "La primera variante es infactible porque exige simultáneamente suma≤4 y≥5. En la segunda, y puede crecer sin límite y el objetivo es no acotado.",
+      "lab": "Formula asignación de turnos sintéticos con cobertura y límites por persona. Resuelve una instancia pequeña por enumeración y por solver; informa brecha, restricciones y sensibilidad.",
+      "refs": [
+        "boyd",
+        "scipyopt"
+      ]
+    },
+    {
+      "id": "DE04",
+      "area": "Decision engineering",
+      "title": "Optimización estocástica y robusta",
+      "pre": "DE02–DE03",
+      "goals": "Modelar decisiones bajo escenarios; distinguir riesgo esperado, peor caso y restricciones probabilísticas.",
+      "theory": "En optimización determinista se supone conocido el entorno. La estocástica representa incertidumbre con distribuciones o escenarios y distingue decisiones previas de acciones de recurso posteriores. La robusta exige buen comportamiento frente a un conjunto de escenarios sin necesitar una distribución exacta, pero el resultado depende de cómo se define ese conjunto.\n\nNo anticipatividad significa que dos escenarios indistinguibles al decidir deben compartir la misma decisión inicial. Permitir que una acción previa “vea” demanda futura produce un valor artificial. Los escenarios deben capturar dependencias y colas relevantes; generar variaciones independientes puede subestimar picos conjuntos.\n\nValor esperado, peor caso y medidas de cola representan preferencias distintas. CVaR resume pérdidas de la cola bajo una convención definida; una restricción probabilística limita frecuencia de incumplimiento, no necesariamente su gravedad. Optimizar sobre una muestra finita puede sobreajustar escenarios. Por eso se separan escenarios de diseño y evaluación y se reportan desempeño promedio, extremos, violaciones y costo de conservadurismo.",
+      "formula": "minₓ cᵀx+Eω[Q(x,ω)] frente a minₓ maxω∈Ω L(x,ω). Para pérdidas continuas: CVaRα=minη {η+E[(L−η)₊]/(1−α)}.",
+      "example": "Política A: pérdida 0 con 90% y 100 con 10%, media 10. Política B: pérdida constante 12. A gana por media; B por peor caso. No hay contradicción: se están usando criterios diferentes.",
+      "pitfall": "Optimizar con conocimiento del futuro; elegir escenarios hasta favorecer una política; llamar robusto a un resultado sin describir Ω.",
+      "exercise": "Calcula el peor caso y la media de A y B. ¿Qué dato adicional hace falta para decidir cuál conviene?",
+      "solution": "A: media 10, peor 100. B: media y peor 12. Se necesitan preferencias sobre riesgo, límites operativos, credibilidad de escenarios y consecuencias de pérdidas extremas.",
+      "lab": "Simula demanda y asignación de capacidad con decisión inicial y recurso. Compara políticas por media, percentiles y tasa de violación en escenarios nuevos.",
+      "refs": [
+        "boyd",
+        "bertsimas"
+      ]
+    },
+    {
+      "id": "DE05",
+      "area": "Decision engineering",
+      "title": "Aprender políticas y evaluar efectos causales",
+      "pre": "F06 y DE01",
+      "goals": "Conectar estimación de efectos con elección de acciones; identificar soporte y sesgo de políticas históricas.",
+      "theory": "Una política π(x) asigna una acción según información disponible. Su valor causal depende de resultados que ocurrirían al aplicar esa política. Datos históricos revelan resultados bajo acciones realmente tomadas, no bajo todas las alternativas. Si solo se aprobaron solicitudes de bajo riesgo, no se conoce directamente qué habría ocurrido al aprobar las rechazadas.\n\nLa evaluación offline necesita supuestos de identificación y soporte. El propensity score describe probabilidad de acción histórica condicionada a variables; ponderar puede reconstruir ciertas comparaciones si hay intercambiabilidad y positividad. Probabilidades cercanas a cero generan pesos inestables. Recortar pesos cambia compromisos y puede cambiar el objetivo efectivo.\n\nLos estimadores doblemente robustos combinan modelos de resultado y asignación; bajo condiciones específicas pueden ser consistentes si uno de ambos está bien especificado, pero no eliminan confusión no medida ni falta de soporte. Separar aprendizaje de política y evaluación reduce optimismo. El diseño prospectivo, cuando es apropiado, aporta evidencia sobre efectos reales que una simulación histórica no sustituye.",
+      "formula": "V(π)=E[Y(π(X))]. Para acciones discretas y supuestos apropiados: V̂IPW=(1/n)Σ 1{Aᵢ=π(Xᵢ)}Yᵢ/e(Aᵢ|Xᵢ).",
+      "example": "Una política histórica jamás asigna acción B a mayores de cierta edad. Una política nueva que lo hace requiere evaluar resultados fuera del soporte histórico. Ningún peso finito recupera observaciones de un grupo que nunca existió.",
+      "pitfall": "Confundir backtest predictivo con valor causal de política; usar propensity como prueba de ausencia de confusión; extrapolar a acciones nunca observadas.",
+      "exercise": "¿Qué sucede con el peso 1/e si e=0.01? ¿Es evidencia más confiable por ser más grande?",
+      "solution": "El peso es 100. Aumenta influencia y varianza de esa observación; no mejora su calidad. Puede indicar escaso solapamiento y una pregunta mal soportada por los datos.",
+      "lab": "Genera un entorno con efectos conocidos y política histórica sesgada. Compara evaluación ingenua, IPW y un modelo de resultados; repite con falta de soporte y confusión no observada.",
+      "refs": [
+        "whatif",
+        "bertsimas"
+      ]
+    },
+    {
+      "id": "DE06",
+      "area": "Decision engineering",
+      "title": "DMN, FEEL y servicios de decisión",
+      "pre": "AE01 y DE01",
+      "goals": "Modelar dependencias y tablas; distinguir políticas de coincidencia; versionar y probar decisiones ejecutables.",
+      "theory": "DMN separa el requisito de decisión de la lógica que lo implementa. Un diagrama de requisitos expresa qué información y conocimiento necesitan las decisiones. Una tabla representa condiciones y salidas; FEEL permite expresiones tipadas, intervalos, listas y contextos. La notación de referencia debe fijarse por versión y contrastarse con lo soportado por el motor elegido.\n\nLa hit policy define qué hacer cuando coinciden reglas. Unique exige a lo sumo una; Any permite varias si producen la misma salida; First depende del orden; Collect reúne resultados y puede agregar según reglas de la especificación. Elegir First para ocultar solapamientos cambia la semántica y dificulta auditoría. Cobertura y ausencia de solapamientos se analizan según dominio y política, no solo con ejemplos felices.\n\nLa ejecución necesita contratos de tipos y tratamiento de valores ausentes. “Desconocido” no debe convertirse en aprobado por una conversión silenciosa a cero. En una arquitectura con Kogito, el modelo, el runtime y las dependencias forman una versión desplegable conjunta; no todas las capacidades del estándar están garantizadas por cualquier combinación.\n\nAuditar una decisión requiere identificador de solicitud, versión de política, entradas pertinentes o referencia protegida, resultado, razones y tiempos. Los logs deben permitir reconstrucción sin exponer innecesariamente datos personales.",
+      "formula": "Contrato: entradas tipadas → decisiones intermedias → salida + motivo + versión. Invariantes: determinismo bajo el mismo contexto y respeto de restricciones.",
+      "example": "Reglas “ingreso<1000 → revisión” e “ingreso≥1000 → elegible” son disjuntas para números válidos. Falta decidir qué ocurre con ingreso desconocido, negativo, moneda distinta o un dato posterior al corte.",
+      "pitfall": "Confundir DRD con flujo de proceso; depender del orden sin declararlo; asumir compatibilidad total de motor; omitir casos nulos y límites.",
+      "exercise": "Con reglas x≤10 → A y x≥10 → B, ¿qué sucede en x=10 bajo Unique? ¿Cómo corregirlo?",
+      "solution": "Coinciden dos reglas con salidas distintas: viola Unique. Si el negocio quiere A hasta 10, la segunda debe ser x>10; también hay que definir dominio y casos ausentes.",
+      "lab": "Diseña una política crediticia sintética modular. Prueba límites, nulos, solapamientos, cobertura y regresión entre dos versiones. Documenta cambios de resultado y su motivo.",
+      "refs": [
+        "dmn"
+      ]
+    },
+    {
+      "id": "DE07",
+      "area": "Decision engineering",
+      "title": "Simulación, colas y experimentos computacionales",
+      "pre": "F03–F04 y DE03",
+      "goals": "Modelar sistemas dinámicos; diferenciar verificación y validación; cuantificar variabilidad de simulación.",
+      "theory": "La simulación estudia un sistema cuando soluciones analíticas son difíciles o se desea explorar reglas operativas. En simulación de eventos discretos, el estado cambia en llegadas, inicios y terminaciones de servicio. Se definen entidades, recursos, colas y políticas de prioridad. Una distribución de duración debe representar adecuadamente heterogeneidad y colas extremas.\n\nVerificar pregunta si el código ejecuta el modelo planteado; validar pregunta si el modelo representa suficientemente el sistema para su propósito. Ajustar parámetros para reproducir una media no garantiza reproducir tiempos de espera ni congestión. Calentamiento, horizonte y condiciones iniciales pueden sesgar resultados.\n\nPara un sistema estable bajo condiciones apropiadas, la ley de Little relaciona cantidad promedio en sistema, tasa de llegada efectiva y tiempo promedio. En una cola M/M/1 se asumen llegadas Poisson, servicios exponenciales, un servidor y estabilidad λ<μ. Cerca de saturación, pequeñas variaciones de demanda aumentan fuertemente espera. Estos supuestos deben revisarse antes de extrapolar a un hospital real.\n\nLas réplicas independientes permiten estimar incertidumbre Monte Carlo. Usar números aleatorios comunes puede mejorar una comparación pareada, pero no sustituye revisar validez del modelo.",
+      "formula": "Ley de Little: L=λW. M/M/1: W=1/(μ−λ), Wq=λ/[μ(μ−λ)] si λ<μ.",
+      "example": "Con λ=4 personas/hora y μ=5, W=1 hora y Wq=0.8 horas; servicio medio=0.2 horas. Si λ sube a 4.8, W=5 horas. La ocupación alta vuelve muy sensible la espera en este modelo.",
+      "pitfall": "Tomar una sola réplica como resultado exacto; validar solo medias; usar fórmulas de colas con demanda no estacionaria sin discutirlo.",
+      "exercise": "Con λ=3 y μ=5, calcula W y L. ¿Qué indica λ≥μ en el modelo M/M/1?",
+      "solution": "W=0.5 horas y L=1.5 personas. Con λ≥μ no existe el régimen estacionario estable utilizado por estas fórmulas.",
+      "lab": "Simula una cola y compara con fórmulas bajo supuestos M/M/1. Después introduce turnos y duración no exponencial; documenta qué aproximaciones dejan de ser válidas.",
+      "refs": [
+        "howard",
+        "scipyopt"
+      ]
+    },
+    {
+      "id": "DE08",
+      "area": "Decision engineering",
+      "title": "Decisiones secuenciales, evaluación y gobierno",
+      "pre": "DE01–DE07",
+      "goals": "Gestionar políticas que cambian el entorno; definir monitoreo, controles y criterios de retiro.",
+      "theory": "Una decisión repetida puede modificar el estado futuro: un límite de crédito cambia exposición; asignar capacidad afecta colas; una recomendación altera datos que luego se usarán para entrenar. Por eso una política puede verse bien en una fotografía y producir efectos acumulados desfavorables.\n\nLos modelos de decisión secuencial describen estado, acción, transición, recompensa y horizonte. No basta con optimizar cada paso si una acción sacrifica valor futuro. La observabilidad parcial obliga a reconocer que el estado real no se conoce completamente. Antes de adoptar aprendizaje por refuerzo conviene comparar reglas y optimización con horizonte, y comprobar si hay un simulador válido o un diseño seguro de evaluación.\n\nEl gobierno fija quién aprueba la política, qué restricciones prevalecen, qué evidencias se exigen y cuándo debe retirarse. Monitorear incluye distribución de entradas, decisiones, excepciones, resultados y efectos por grupos pertinentes. Métricas de equidad distintas pueden entrar en tensión; elegirlas requiere contexto y responsables. Un proceso de revisión necesita capacidad real y evidencia útil, no solo una etiqueta de supervisión humana.\n\nLa evaluación distingue desempeño del modelo, fidelidad de ejecución, utilidad de política y consecuencias del sistema. No se certifica una dimensión con evidencia de otra.",
+      "formula": "Valor secuencial: Vπ(s)=Eπ[Σₜ γᵗrₜ | s₀=s], con horizonte y descuento definidos.",
+      "example": "Una política que aprueba más hoy mejora volumen inicial, pero puede aumentar exposición y pérdidas futuras. Un backtest que solo cuenta aprobaciones no evalúa el objetivo acumulado.",
+      "pitfall": "Monitorear solo AUC; cambiar política sin versionar; declarar neutralidad porque no se utiliza explícitamente una variable sensible.",
+      "exercise": "Propón cuatro indicadores para monitorear una política de asignación hospitalaria sin confundirlos con validación clínica.",
+      "solution": "Tiempos de espera, utilización, incumplimiento de restricciones y distribución de prioridad o acceso por grupos pertinentes. Deben interpretarse con gravedad, demanda y diseño del estudio; no prueban por sí solos beneficio clínico.",
+      "lab": "Proyecto DE: compara regla simple, política DMN y optimizador en un simulador. Entrega sensibilidad, resultados por escenario, fallos, restricciones, auditoría y condiciones para no desplegar.",
+      "refs": [
+        "sutton",
+        "whatif",
+        "debt"
+      ]
+    },
+    {
+      "id": "LS01",
+      "area": "Life science informatics",
+      "title": "Biología molecular y representación computacional",
+      "pre": "F03–F05",
+      "goals": "Distinguir niveles de información biológica; conectar medición, mecanismo y pregunta computacional.",
+      "theory": "El ADN almacena secuencias que, según contexto, participan en regulación y producción de ARN. Parte del ARN se traduce en proteínas, pero no todo ARN es codificante y la actividad biológica no queda descrita por una secuencia aislada. Expresión, procesamiento, modificaciones y contexto celular influyen en el resultado. Una variante asociada a un rasgo no demuestra por sí sola un mecanismo causal.\n\nLa bioinformática trabaja con representaciones: secuencias, coordenadas, grafos, matrices de conteos, estructuras y anotaciones. Toda representación pierde información. Una referencia genómica y su versión determinan qué significa una coordenada; dos identificadores de genes pueden apuntar a anotaciones distintas. El flujo necesita conservar especie, ensamblaje, versión de anotación, unidades y origen.\n\nLas mediciones son procesos experimentales con ruido y sesgo. Una diferencia puede surgir por biología, lote, preparación o instrumento. Si todos los controles se procesan en un lote y los tratados en otro, efecto de tratamiento y lote quedan confundidos. La sofisticación del algoritmo no puede recuperar sin supuestos una separación que el diseño no permite.\n\nPara Andrés, la formación química ofrece familiaridad con mecanismos y medición; la brecha específica está en genética, biología molecular y tecnologías ómicas, que requieren estudio adicional antes de interpretar resultados especializados.",
+      "formula": "Observación = señal biológica + variación técnica + error, como esquema conceptual; la forma estadística concreta depende del ensayo.",
+      "example": "Dos archivos indican “posición 1000” pero usan ensamblajes distintos. No puede suponerse que refieran al mismo locus. Primero se verifica referencia y, si procede, se realiza una conversión validada de coordenadas.",
+      "pitfall": "Tratar un gen como una única unidad inmutable; ignorar versiones; atribuir a biología una separación causada por lote.",
+      "exercise": "Distingue secuencia, expresión y estructura. ¿Por qué predecir estructura no responde automáticamente qué ocurre en una célula?",
+      "solution": "Secuencia es orden de unidades; expresión mide abundancia bajo un ensayo; estructura describe organización espacial. Función celular depende además de contexto, interacciones, localización y condiciones.",
+      "lab": "Crea un diccionario para un estudio ficticio con muestras, genes y mediciones. Identifica versiones, lote y covariables; dibuja qué preguntas pueden responderse y cuáles no.",
+      "refs": [
+        "durbin",
+        "ebi",
+        "alphafold"
+      ]
+    },
+    {
+      "id": "LS02",
+      "area": "Life science informatics",
+      "title": "Alineamiento, secuencias y modelos probabilísticos",
+      "pre": "F01–F03 y LS01",
+      "goals": "Comprender alineamiento global/local, puntuaciones y programación dinámica; interpretar búsquedas de similitud con cautela.",
+      "theory": "Alinear secuencias busca correspondencias bajo un sistema de puntuación que recompensa coincidencias y penaliza sustituciones o huecos. Alineamiento global compara secuencias de extremo a extremo; local encuentra regiones similares. La solución depende de penalizaciones y del objetivo biológico. Un hueco puede representar inserción o deleción respecto de otra secuencia, pero el alineamiento no revela por sí solo toda la historia evolutiva.\n\nLa programación dinámica resuelve subproblemas y combina sus resultados. En un alineamiento global simple, cada celda considera emparejar dos símbolos o introducir un hueco. El cálculo O(nm) puede ser costoso para secuencias largas; métodos heurísticos de búsqueda priorizan velocidad sin equivaler siempre al óptimo exhaustivo.\n\nLos modelos ocultos de Markov distinguen estados latentes, transiciones y emisiones. Un perfil puede representar patrones de una familia de secuencias. La probabilidad de una secuencia se obtiene sumando caminos; el camino más probable es otra pregunta. Confundir ambos objetivos altera la interpretación.\n\nLa significación de una similitud depende de longitud, composición, base consultada y modelo nulo. Identidad no equivale a función idéntica; homología expresa una relación de ascendencia, no un porcentaje que aumenta y disminuye como la identidad.",
+      "formula": "D(i,j)=max{D(i−1,j−1)+s(aᵢ,bⱼ), D(i−1,j)−g, D(i,j−1)−g}, con inicialización apropiada para alineamiento global.",
+      "example": "Con coincidencia +1, sustitución −1 y hueco −1, alinear “AC” con “AG” sin huecos da 0. Otras puntuaciones o secuencias pueden favorecer huecos. La conclusión depende del esquema elegido.",
+      "pitfall": "Confundir porcentaje de identidad con “porcentaje de homología”; comparar puntajes de bases distintas sin revisar contexto; confundir mejor camino con probabilidad total.",
+      "exercise": "¿Qué cambia conceptualmente al añadir una opción cero a la recurrencia y permitir comenzar dentro de las secuencias?",
+      "solution": "Se permite reiniciar el puntaje y recuperar un alineamiento local, buscando una región favorable en vez de exigir correspondencia completa de extremos.",
+      "lab": "Implementa alineamiento global de cadenas cortas y verifica por enumeración casos mínimos. Cambia penalización de hueco y explica cómo cambia el alineamiento; documenta complejidad.",
+      "refs": [
+        "durbin",
+        "blast"
+      ]
+    },
+    {
+      "id": "LS03",
+      "area": "Life science informatics",
+      "title": "Ómicas, multiplicidad y alta dimensión",
+      "pre": "F04–F05 y LS01",
+      "goals": "Diseñar análisis de expresión; controlar multiplicidad; distinguir replicación biológica y técnica.",
+      "theory": "En ómicas se miden muchas variables y a menudo pocas muestras. La relación p≫n favorece sobreajuste y resultados inestables. Las réplicas biológicas informan variación entre unidades biológicas; las técnicas evalúan componentes de medición, pero no sustituyen automáticamente nuevas unidades independientes.\n\nEn RNA-seq, conteos reflejan abundancia y factores técnicos como profundidad. El análisis de expresión diferencial requiere una normalización y una distribución apropiadas, además de covariables de diseño. DESeq2 es un ejemplo de modelado binomial negativo; su documentación debe consultarse para requisitos e interpretación exacta. Un cociente de promedios normalizados no equivale a un análisis inferencial completo.\n\nMiles de contrastes hacen esperables falsos positivos. El control FDR limita una proporción esperada de descubrimientos falsos bajo sus supuestos; no significa que cada gen declarado tenga exactamente esa probabilidad de ser falso. Benjamini–Hochberg ordena p-valores y compara con umbrales crecientes. Efecto, incertidumbre y plausibilidad biológica complementan el ajuste.\n\nEn datos single-cell, muchas células de una persona no equivalen a muchas personas. Confundir unidad celular y donante crea pseudorreplicación. Los efectos de lote y la selección de genes deben manejarse sin contaminar evaluación. Una visualización separada no prueba una población biológica nueva.",
+      "formula": "BH: ordenar p(1)≤…≤p(m); elegir el mayor k con p(k)≤(k/m)q y rechazar hasta k, bajo las condiciones del procedimiento.",
+      "example": "Con p=[0.001,0.01,0.04,0.20] y q=0.05, umbrales=[0.0125,0.025,0.0375,0.05]. El mayor índice que cumple es 2: se declaran los dos primeros.",
+      "pitfall": "Seleccionar genes antes de separar muestras de evaluación; tratar células como pacientes independientes; interpretar FDR como probabilidad individual automática.",
+      "exercise": "Con 1,000 hipótesis nulas verdaderas y pruebas a nivel 0.05 sin ajuste, ¿cuántos rechazos falsos se esperan marginalmente?",
+      "solution": "50 en expectativa si cada prueba mantiene nivel 0.05. Eso no describe toda la distribución de falsos descubrimientos ni una garantía sobre una ejecución particular.",
+      "lab": "Simula conteos con señales conocidas, lotes y réplicas. Compara análisis sin ajuste y BH; reporta descubrimientos, potencia y limitaciones. Para práctica real, usa un tutorial público autorizado.",
+      "refs": [
+        "deseq",
+        "ebi"
+      ]
+    },
+    {
+      "id": "LS04",
+      "area": "Life science informatics",
+      "title": "Interoperabilidad clínica: FHIR, OMOP y vocabularios",
+      "pre": "AE01–AE05 y LS01",
+      "goals": "Diferenciar intercambio operacional y representación analítica; preservar significado y trazabilidad al mapear datos.",
+      "theory": "Interoperar exige más que compartir JSON o columnas. Dos sistemas pueden leer el mismo formato e interpretar unidades, estados o conceptos de manera distinta. La interoperabilidad sintáctica describe estructura; la semántica requiere significado compatible y contexto de uso.\n\nFHIR organiza intercambio mediante recursos y perfiles para casos definidos. Patient, Encounter y Observation representan conceptos diferentes y se relacionan por referencias. Un perfil impone restricciones adicionales; un archivo válido contra una estructura general no demuestra que cumpla la implementación local. La versión del estándar y de los perfiles debe registrarse.\n\nOMOP CDM organiza datos observacionales para análisis comunes, con tablas y vocabularios estandarizados. FHIR y OMOP cumplen propósitos distintos y pueden coexistir. Mapear no es copiar campos: hace falta resolver identificadores, tiempos, unidades, conceptos, ausencia y procedencia. Deben conservarse códigos originales y decisiones de mapeo para auditoría.\n\nLas terminologías responden a tareas diferentes: observaciones, diagnósticos, procedimientos y medicamentos no son intercambiables. Un mapeo de concepto cercano puede perder especificidad o introducir error. La calidad se comprueba con frecuencias, dominios, cronología, unidades y revisión experta. Estandarizar estructura facilita análisis, pero no elimina sesgos de captura clínica.",
+      "formula": "Fuente + versión + código + unidad + contexto → concepto estándar + transformación documentada + trazabilidad al original.",
+      "example": "Una medición de glucosa con valor “100” carece de interpretación completa sin unidad, tipo de muestra, instante y contexto. Convertir unidades exige una regla específica del analito, no multiplicar todas las observaciones por el mismo factor.",
+      "pitfall": "Tratar FHIR y OMOP como alternativas equivalentes; perder códigos originales; asumir equivalencia clínica por parecido de etiquetas.",
+      "exercise": "¿Un recurso FHIR Observation representa automáticamente un diagnóstico? ¿Qué debes revisar antes de transformar datos a OMOP?",
+      "solution": "No: el modelo contempla recursos distintos para conceptos distintos. Revisa significado, dominio, unidades, temporalidad, versión, códigos y convenciones del CDM; valida con documentación y conocimiento del dominio.",
+      "lab": "Construye un pequeño conjunto sintético de paciente, episodio y observaciones. Define mapeo conceptual FHIR–tablas analíticas y lista pérdidas de información; no lo presentes como implementación certificada.",
+      "refs": [
+        "fhir",
+        "omop",
+        "ohdsi"
+      ]
+    },
+    {
+      "id": "LS05",
+      "area": "Life science informatics",
+      "title": "Cohortes, epidemiología y datos observacionales",
+      "pre": "F06 y LS04",
+      "goals": "Definir poblaciones y ventanas reproducibles; reconocer sesgos de selección, tiempo inmortal y confusión.",
+      "theory": "Una cohorte define personas elegibles durante un tiempo, con un evento índice y reglas de seguimiento. El criterio de inclusión debe poder ejecutarse sin conocer indebidamente el futuro. Ventanas previas miden antecedentes; ventanas posteriores definen desenlaces o exposición, según el diseño.\n\nIncidencia describe nuevos eventos en población en riesgo; prevalencia describe presencia en una población y momento o periodo definidos. Una tasa por persona-tiempo no equivale a una proporción de riesgo acumulado. Comparar grupos exige denominadores y oportunidades de observación coherentes.\n\nEl tiempo inmortal aparece cuando una clasificación exige sobrevivir o permanecer observable hasta un evento posterior y ese periodo se asigna de manera que favorece un grupo. La causalidad observacional requiere alinear elegibilidad, asignación y comienzo del seguimiento. Emular un ensayo objetivo obliga a escribir esos elementos antes de estimar.\n\nLos registros asistenciales reflejan decisiones de atención: no medir no equivale a ausencia de enfermedad. La intensidad de observación puede depender de gravedad, acceso o centro. Los fenotipos computacionales necesitan validación y análisis de sensibilidad. Una consulta técnicamente correcta puede definir una población distinta de la pregunta científica.",
+      "formula": "Riesgo acumulado ≈ eventos nuevos / personas inicialmente en riesgo, según diseño; tasa de incidencia = eventos / persona-tiempo en riesgo.",
+      "example": "Diez eventos en 100 personas seguidas un año no son comparables directamente con diez en 100 seguidas un mes. Aun usando persona-tiempo, deben revisarse estabilidad del riesgo y selección.",
+      "pitfall": "Usar exposición futura para clasificar al inicio; contar visitas como personas; llamar “sanos” a quienes no tienen código registrado.",
+      "exercise": "Un estudio define tratados como quienes recibieron un medicamento durante los primeros 90 días y cuenta seguimiento desde el día 0. ¿Qué problema debe revisarse?",
+      "solution": "La definición puede exigir sobrevivir o estar observable hasta recibir el medicamento y generar tiempo inmortal. Deben alinearse estrategia, elegibilidad y seguimiento o modelar adecuadamente la exposición temporal.",
+      "lab": "Escribe una definición de cohorte sintética con índice, lavado, inclusión, exclusión, desenlace y censura. Audita diez trayectorias a mano y compara con SQL.",
+      "refs": [
+        "cohorts",
+        "whatif"
+      ]
+    },
+    {
+      "id": "LS06",
+      "area": "Life science informatics",
+      "title": "Supervivencia, riesgos competitivos y datos longitudinales",
+      "pre": "F04–F06 y LS05",
+      "goals": "Analizar tiempo hasta evento y censura; interpretar hazard sin confundirlo con probabilidad; tratar correlación de medidas repetidas.",
+      "theory": "En tiempo hasta evento no siempre se observa el desenlace: una persona puede terminar seguimiento antes. La censura derecha informa que el evento no ocurrió hasta cierto instante, no que ocurrió allí ni que nunca ocurrirá. El análisis necesita supuestos sobre el mecanismo de censura, a veces condicionados a covariables.\n\nLa función de supervivencia S(t) es probabilidad de permanecer sin el evento más allá de t. El hazard es una tasa instantánea condicionada a haber llegado sin evento; no es probabilidad acumulada. Kaplan–Meier combina proporciones de supervivencia en los tiempos observados. Cox modela un hazard basal multiplicado por exp(βᵀx) y presupone proporcionalidad para esa interpretación simple.\n\nCon eventos competitivos, un evento puede impedir observar otro. Tratarlo como censura ordinaria no responde siempre a la probabilidad acumulada de interés. La incidencia acumulada considera la competencia; modelos de hazard específico y subdistribución responden preguntas diferentes.\n\nLos datos longitudinales contienen observaciones correlacionadas por persona. Modelos mixtos o ecuaciones de estimación abordan estructuras distintas y producen interpretaciones diferentes. La ausencia de mediciones puede depender del estado de salud, por lo que una imputación rutinaria no elimina sesgo informativo.",
+      "formula": "S(t)=P(T>t); ŜKM(t)=∏tⱼ≤t(1−dⱼ/nⱼ). Cox: h(t|x)=h₀(t)exp(βᵀx).",
+      "example": "Cinco personas están en riesgo antes del primer evento: factor 4/5. Una se censura luego; antes del siguiente evento quedan tres: factor 2/3. La supervivencia estimada tras ambos es (4/5)(2/3)=0.5333.",
+      "pitfall": "Eliminar censurados o contarlos como eventos; interpretar HR=2 como el doble de riesgo acumulado; ignorar correlación de visitas de una persona.",
+      "exercise": "¿Qué significa censurar al día 30? ¿Un hazard ratio constante garantiza diferencias constantes de supervivencia?",
+      "solution": "Solo se sabe que no se observó el evento hasta el día 30, bajo el esquema del estudio. No: proporcionalidad de hazards no implica diferencia constante ni razón constante de riesgos acumulados.",
+      "lab": "Simula tiempos con censura independiente y luego dependiente. Calcula Kaplan–Meier y compara con la verdad conocida; verifica cómo cambia la interpretación de un modelo Cox.",
+      "refs": [
+        "survival",
+        "whatif"
+      ]
+    },
+    {
+      "id": "LS07",
+      "area": "Life science informatics",
+      "title": "IA biomédica, multimodalidad y validación externa",
+      "pre": "LS01–LS06 y AI02",
+      "goals": "Evaluar sistemas con pacientes, centros y tiempos separados; distinguir desempeño estadístico y utilidad en atención.",
+      "theory": "Los datos biomédicos incluyen texto, imágenes, señales, laboratorios y secuencias. Combinar modalidades requiere alinear persona, episodio y tiempo. Una variable disponible después de la decisión puede mejorar una métrica y hacer el sistema inutilizable en la práctica. El instante de predicción debe definirse antes de construir features.\n\nLa partición debe respetar las dependencias. Imágenes de la misma persona en entrenamiento y test pueden permitir reconocimiento de identidad o centro en vez de generalización. Una evaluación externa por hospital y tiempo comprueba cambios de población, protocolos y equipos. No garantiza portabilidad universal, pero aporta evidencia distinta de la validación interna.\n\nDiscriminación, calibración y utilidad responden preguntas diferentes. Un modelo puede ordenar bien riesgos y sobreestimarlos sistemáticamente. Al elegir un umbral deben considerarse prevalencia, capacidad, consecuencias y flujo de trabajo. El rendimiento retrospectivo no demuestra que utilizar el sistema mejore desenlaces.\n\nLos sistemas generativos añaden errores de omisión, afirmaciones no sustentadas y variabilidad por instrucciones. Un resumen legible puede ser inexacto. La evaluación requiere fuentes de referencia, revisión apropiada y análisis de fallos; guías de reporte como TRIPOD+AI o TRIPOD-LLM ayudan a describir estudios, pero no certifican seguridad ni efectividad.",
+      "formula": "Utilidad del sistema ≠ AUC. Evaluación: discriminación + calibración + carga de trabajo + errores + consecuencias + contexto.",
+      "example": "Se entrena con radiografías de un centro y se evalúa en imágenes del mismo paciente tomadas días después. El test no mide adecuadamente generalización a pacientes nuevos; separar pacientes es necesario, aunque todavía no prueba traslado a otro centro.",
+      "pitfall": "Fuga entre visitas; usar decisiones médicas posteriores como predictores iniciales; presentar un benchmark como evidencia clínica.",
+      "exercise": "Un modelo mantiene AUC pero su riesgo estimado duplica sistemáticamente el observado. ¿Qué dimensión falla y qué no debes concluir?",
+      "solution": "Falla calibración. La discriminación puede mantenerse porque el orden no cambia. No puede concluirse que los umbrales basados en esas probabilidades conserven utilidad.",
+      "lab": "Compara modelos en un conjunto sintético por paciente, centro y periodo. Entrega discriminación, calibración, errores por subgrupo y protocolo prospectivo hipotético; usa lenguaje de investigación.",
+      "refs": [
+        "tripod",
+        "tripodllm",
+        "mimic",
+        "alphafold"
+      ]
+    },
+    {
+      "id": "LS08",
+      "area": "Life science informatics",
+      "title": "Ciencia reproducible, privacidad y stewardship",
+      "pre": "F07–F08 y LS01–LS07",
+      "goals": "Diseñar flujos auditables; distinguir acceso abierto y acceso permitido; documentar límites de reutilización.",
+      "theory": "Una investigación reproducible conserva procedencia, versiones, parámetros y entorno. Un workflow representa dependencias y permite reanudar pasos sin mezclar resultados incompatibles. Los contenedores ayudan a encapsular dependencias, pero no conservan por sí solos datos, hardware, servicios externos ni licencias.\n\nFAIR busca que los datos sean encontrables, accesibles bajo condiciones explícitas, interoperables y reutilizables. No exige hacer públicos datos personales. Un catálogo puede publicar metadatos y un procedimiento de acceso mientras mantiene protegido el contenido. Identificadores persistentes y diccionarios facilitan reconstruir qué se analizó.\n\nQuitar nombres no garantiza anonimato: combinaciones de fechas, centros o características raras pueden permitir reidentificación. La minimización limita lo recolectado y retenido al propósito. Privacidad diferencial formaliza un límite a cuánto cambia una distribución de salidas por la presencia de una persona, según un modelo de vecindad y parámetros; no es equivalente a añadir cualquier ruido. El aprendizaje federado mantiene ciertos datos locales, pero gradientes y resultados todavía pueden revelar información.\n\nLas condiciones de MIMIC y otros repositorios deben cumplirse antes de usar datos. Para aprender, los datos sintéticos reducen dependencias de acceso, pero no demuestran validez sobre pacientes reales. El steward documenta permisos, versiones, retención y responsabilidades.",
+      "formula": "Trazabilidad: muestra o persona seudónima → fuente → transformación → versión de análisis → resultado, con acceso proporcional al rol.",
+      "example": "Compartir un notebook que intenta leer una base privada no reproduce el estudio. Puede compartirse código, esquema, entorno y datos sintéticos, además del procedimiento autorizado para solicitar acceso a los datos originales.",
+      "pitfall": "Confundir seudonimización con anonimato; asumir que federado elimina todo riesgo; publicar datos porque una herramienta los permite descargar.",
+      "exercise": "¿Qué elementos compartirías para reproducir un análisis sin divulgar historias clínicas? Nombra también una limitación.",
+      "solution": "Código versionado, entorno, parámetros, definiciones de cohorte, diccionario, generador sintético y procedimiento de acceso. La réplica sintética verifica mecánica, pero no reproduce toda la distribución ni las conclusiones empíricas reales.",
+      "lab": "Proyecto LS: entrega workflow con datos sintéticos, cohorte reproducible, mapeo semántico, análisis y manifiesto. Incluye ficha de datos, permisos previstos y evaluación de sesgos.",
+      "refs": [
+        "fair",
+        "mimic",
+        "ohdsi"
+      ]
+    },
+    {
+      "id": "AI01",
+      "area": "Inteligencia artificial",
+      "title": "Búsqueda, planificación y representación del conocimiento",
+      "pre": "F01 y F07",
+      "goals": "Formular estados, acciones y metas; comparar búsqueda informada y no informada; distinguir lógica simbólica y aprendizaje.",
+      "theory": "Un problema de búsqueda define estado inicial, acciones, transiciones, prueba de meta y costo. La representación determina qué soluciones puede expresar el sistema. Si se omite una restricción del estado, encontrar un camino óptimo en el modelo no significa encontrar uno válido en el mundo real.\n\nBúsqueda en anchura encuentra el menor número de pasos en grafos con costo uniforme bajo condiciones apropiadas; costo uniforme ordena por costo acumulado no negativo. A* combina costo acumulado g con una estimación h del costo restante. Una heurística admisible no sobreestima el costo real; para ciertas implementaciones en grafos, consistencia o reaperturas son relevantes para preservar garantías. Una heurística agresiva puede acelerar búsqueda sacrificando optimalidad.\n\nLa planificación utiliza precondiciones y efectos para construir secuencias de acciones. Los problemas de satisfacción de restricciones buscan asignaciones compatibles, a menudo con propagación y backtracking. La lógica permite expresar reglas y derivar consecuencias, pero debe distinguirse mundo cerrado —lo no registrado se trata como falso— de mundo abierto —lo desconocido permanece posible—.\n\nLos sistemas híbridos combinan representación explícita, búsqueda y modelos aprendidos. Una regla trazable puede ser preferible a un modelo para restricciones exactas; un modelo puede estimar cantidades inciertas que alimentan un plan. No toda solución inteligente requiere entrenamiento.",
+      "formula": "A*: f(n)=g(n)+h(n). Restricción heurística admisible: h(n)≤h*(n), donde h* es costo real mínimo restante.",
+      "example": "En una cuadrícula con pasos ortogonales de costo 1 y sin atajos, la distancia Manhattan es una cota inferior al camino. Con movimientos diagonales baratos deja de ser automáticamente admisible.",
+      "pitfall": "Confundir menor cantidad de pasos con menor costo; declarar optimalidad sin condiciones; codificar hechos ausentes como falsos sin justificarlo.",
+      "exercise": "¿A qué algoritmo se parece A* cuando h=0? ¿Qué pasa si la heurística sobreestima?",
+      "solution": "Se reduce a búsqueda de costo uniforme. Sobreestimar elimina la garantía clásica de optimalidad, aunque en algunos problemas todavía encuentre el óptimo.",
+      "lab": "Implementa búsqueda de rutas y un pequeño problema de asignación con restricciones. Compara nodos expandidos y costo; construye una heurística no admisible y observa un contraejemplo.",
+      "refs": [
+        "aima"
+      ]
+    },
+    {
+      "id": "AI02",
+      "area": "Inteligencia artificial",
+      "title": "Aprendizaje supervisado y evaluación honesta",
+      "pre": "F04–F07",
+      "goals": "Construir baselines, particiones y métricas coherentes con el despliegue; detectar fuga y sobreajuste de selección.",
+      "theory": "El aprendizaje supervisado utiliza pares de entrada y respuesta para aprender una función. El riesgo empírico promedia pérdida en entrenamiento; la generalización se refiere a observaciones relevantes no utilizadas para ajustar ni seleccionar. Un baseline simple establece cuánto aporta la complejidad: media, mayoría, regla conocida o pronóstico estacional.\n\nEntrenamiento ajusta parámetros; validación selecciona decisiones de modelado; test estima desempeño final bajo un protocolo fijado. La partición debe representar el uso: por tiempo para futuro, por persona para sujetos nuevos y por centro para traslado. Preprocesamiento, selección de variables e imputación se aprenden dentro de cada partición de entrenamiento. El cross-validation no corrige una definición temporal equivocada.\n\nLa métrica debe corresponder al objetivo. Accuracy puede ocultar fallos en clases raras; precision y recall cambian con umbral y prevalencia. ROC-AUC mide ordenamiento bajo una comparación específica; PR-AUC depende más de prevalencia y detalles de cálculo. Log-loss y Brier evalúan probabilidades, mientras que calibración compara predicción y frecuencia. Ninguna resume todas las consecuencias.\n\nRegularización, árboles y ensambles ofrecen diferentes sesgos inductivos. Buscar muchos modelos y reportar el mejor test sobreajusta el propio test. La incertidumbre de evaluación debe respetar dependencia por persona o tiempo.",
+      "formula": "Precision=TP/(TP+FP); recall=TP/(TP+FN); Brier=(1/n)Σ(pᵢ−yᵢ)².",
+      "example": "Si solo 1% de eventos son positivos, predecir siempre negativo da 99% accuracy y recall cero. La cifra alta no prueba utilidad para detectar positivos.",
+      "pitfall": "Escalar antes de separar datos; usar el futuro como predictor; elegir umbral en test; tratar filas del mismo sujeto como independientes.",
+      "exercise": "Con TP=40, FP=10 y FN=20, calcula precision y recall. ¿Puedes obtener accuracy sin más datos?",
+      "solution": "Precision=40/50=0.8; recall=40/60≈0.6667. Falta TN para calcular accuracy.",
+      "lab": "Compara regresión logística y boosting en datos sintéticos con fechas y personas repetidas. Muestra diferencia entre partición aleatoria y temporal; fija test antes de seleccionar.",
+      "refs": [
+        "isl",
+        "sklearn",
+        "sklearncv"
+      ]
+    },
+    {
+      "id": "AI03",
+      "area": "Inteligencia artificial",
+      "title": "Aprendizaje no supervisado y representaciones",
+      "pre": "F01–F05",
+      "goals": "Interpretar PCA, clustering y embeddings sin convertir visualizaciones en evidencia concluyente.",
+      "theory": "El aprendizaje no supervisado busca estructura sin una respuesta objetivo observada. Esa estructura depende de representación, escalas y criterio. K-means minimiza distancias cuadráticas a centroides y favorece ciertas formas de agrupamiento; métodos basados en densidad o mezclas responden a supuestos distintos. Elegir k por una gráfica no demuestra que existan k poblaciones naturales.\n\nPCA aproxima datos mediante un subespacio de baja dimensión maximizando varianza explicada bajo su formulación. No garantiza conservar separaciones útiles para una tarea ni revelar causas. Embeddings aprendidos comprimen relaciones según un objetivo de entrenamiento; su cercanía puede reflejar frecuencia, estilo o sesgos del corpus, además de significado.\n\nMétodos de visualización como t-SNE o UMAP transforman relaciones y pueden distorsionar distancias globales, densidades y tamaños. Un grupo visual aislado requiere validación fuera de la imagen: estabilidad, asociación con variables relevantes y replicación. Ajustar parámetros hasta obtener una separación deseada es una forma de selección.\n\nLa evaluación puede usar reconstrucción, estabilidad entre muestras, utilidad en una tarea posterior y conocimiento del dominio. Un buen índice interno no implica utilidad de negocio. En segmentación, hay que decidir si grupos son descriptivos, predictivos o destinatarios de intervenciones; estos propósitos exigen evidencias distintas.",
+      "formula": "K-means: minC,μ Σᵢ ‖xᵢ−μCᵢ‖². PCA: minimizar error de reconstrucción de rango reducido tras centrar apropiadamente.",
+      "example": "Si una variable está en miles de euros y otra en proporciones entre 0 y 1, la distancia euclidiana puede estar dominada por la primera. Estandarizar cambia qué significa cercanía; no es una operación neutral.",
+      "pitfall": "Confundir clusters con clases verdaderas; interpretar distancia entre islas de t-SNE como magnitud original; asignar etiquetas causales a segmentos descriptivos.",
+      "exercise": "¿Por qué un cluster de pacientes podría reflejar el hospital en lugar de una enfermedad? ¿Qué comprobarías?",
+      "solution": "Equipos, protocolos, codificación y poblaciones difieren por centro. Revisaría asociación cluster-centro, lotes, unidades, estabilidad y replicación en centros externos.",
+      "lab": "Compara PCA, clustering y una proyección visual con datos de señal y lote conocidos. Evalúa estabilidad por remuestreo y utilidad posterior; presenta una interpretación alternativa.",
+      "refs": [
+        "isl",
+        "murphy"
+      ]
+    },
+    {
+      "id": "AI04",
+      "area": "Inteligencia artificial",
+      "title": "Modelos probabilísticos y variables latentes",
+      "pre": "F03–F05 y AI02",
+      "goals": "Factorizar distribuciones; diferenciar estimación puntual e inferencia posterior; reconocer aproximaciones y no identificabilidad.",
+      "theory": "Un modelo probabilístico especifica cómo podrían generarse observaciones a partir de parámetros y variables latentes. Una red bayesiana factoriza una distribución por relaciones condicionales; el grafo no es automáticamente causal. Los modelos de mezcla representan heterogeneidad mediante componentes cuya interpretación depende de supuestos y datos.\n\nLa estimación de máxima verosimilitud elige parámetros que hacen más compatibles las observaciones; la inferencia bayesiana combina verosimilitud y prior para producir una posterior. Un prior puede regularizar y representar conocimiento, pero no resuelve una verosimilitud mal especificada ni garantiza objetividad. Comprobar sensibilidad y predicción posterior revela límites.\n\nCon variables latentes, EM alterna expectativas bajo parámetros corrientes y actualización de parámetros. Puede converger a óptimos locales o puntos estacionarios; distintas inicializaciones importan. MCMC aproxima muestras de una posterior y necesita diagnósticos de mezcla y convergencia; inferencia variacional usa una familia aproximada y una optimización que puede subestimar ciertas incertidumbres.\n\nIdentificación significa que distintos parámetros no generan exactamente la misma distribución observable, salvo simetrías reconocidas. En mezclas hay intercambio de etiquetas; en modelos causales puede faltar identificación aun con infinitos datos observacionales. Más cómputo no elimina información ausente.",
+      "formula": "P(θ|D) ∝ P(D|θ)P(θ). Predicción posterior: P(y*|D)=∫P(y*|θ)P(θ|D)dθ.",
+      "example": "Con prior Beta(2,2) para una probabilidad binaria y 8 éxitos en 10 ensayos, la posterior es Beta(10,4), media 10/14≈0.7143. La frecuencia observada es 0.8; el prior cambia la estimación.",
+      "pitfall": "Interpretar aristas probabilísticas como causalidad; ignorar convergencia MCMC; tratar una aproximación variacional como posterior exacta.",
+      "exercise": "Con prior Beta(1,1), tres éxitos y un fracaso, ¿cuál es la posterior y su media?",
+      "solution": "Beta(4,2), con media 4/6≈0.6667. El cálculo supone ensayos Bernoulli intercambiables bajo una probabilidad común.",
+      "lab": "Implementa una actualización conjugada y un modelo de mezcla sencillo. Explora sensibilidad a prior e inicialización; compara incertidumbre y ajuste predictivo con un baseline.",
+      "refs": [
+        "murphy",
+        "mml"
+      ]
+    },
+    {
+      "id": "AI05",
+      "area": "Inteligencia artificial",
+      "title": "Redes neuronales y aprendizaje profundo",
+      "pre": "F01–F02 y AI02",
+      "goals": "Explicar backpropagation, arquitectura y regularización; diseñar entrenamiento y evaluación con controles básicos.",
+      "theory": "Una red compone transformaciones parametrizadas y no linealidades. La profundidad permite representar funciones complejas; sin activaciones no lineales, múltiples capas lineales se reducen a una transformación lineal. Backpropagation aplica la regla de la cadena para calcular gradientes eficientemente; no es un mecanismo de comprensión semántica por sí solo.\n\nEl entrenamiento combina inicialización, batches, pérdida, optimizador y regularización. Descenso estocástico usa gradientes de muestras; optimizadores adaptativos modifican escalas efectivas. Una pérdida que baja no garantiza generalización. Curvas de entrenamiento y validación, revisión de datos y un baseline ayudan a distinguir falta de capacidad, sobreajuste y errores de implementación.\n\nLas convoluciones comparten parámetros sobre posiciones y aprovechan estructura local; redes recurrentes comparten dinámica temporal; atención mezcla información según compatibilidades aprendidas. La arquitectura debe responder al tipo de dato y presupuesto, no a prestigio. Transfer learning reutiliza representaciones, pero dominio y condiciones de evaluación siguen importando.\n\nDropout, weight decay y early stopping controlan aspectos distintos. La normalización y los modos de entrenamiento/evaluación alteran comportamiento. Los checkpoints deben registrar arquitectura, pesos, preprocesamiento y configuración. Una inferencia que transforma datos de forma distinta al entrenamiento produce un sistema diferente del evaluado.",
+      "formula": "h=σ(W₁x+b₁); ŷ=W₂h+b₂. Gradiente por cadena: ∂L/∂W₁=(∂L/∂h)(∂h/∂W₁), con dimensiones compatibles.",
+      "example": "Si dos capas son h=W₁x y y=W₂h sin no linealidad, y=(W₂W₁)x. Añadir capas no amplía esta familia más allá de transformaciones lineales, aunque cambie parametrización y optimización.",
+      "pitfall": "Usar red profunda como primer baseline; olvidar modo evaluación; comparar arquitecturas con presupuestos de búsqueda muy diferentes.",
+      "exercise": "¿Por qué una red con pérdida de entrenamiento casi cero puede fallar en datos nuevos? Da dos causas distintas.",
+      "solution": "Puede memorizar ruido o ejemplos, o enfrentar un cambio de distribución. También puede haber fuga en validación o diferencias de preprocesamiento; cada causa exige diagnóstico distinto.",
+      "lab": "Entrena una red pequeña en datos sintéticos y compara con un modelo lineal. Registra curvas, semillas, tiempo y sensibilidad; prueba deliberadamente un cambio de distribución.",
+      "refs": [
+        "deep",
+        "d2l"
+      ]
+    },
+    {
+      "id": "AI06",
+      "area": "Inteligencia artificial",
+      "title": "Transformers, modelos generativos y RAG",
+      "pre": "AI04–AI05",
+      "goals": "Distinguir preentrenamiento, adaptación y recuperación; evaluar afirmaciones generadas y límites de contexto.",
+      "theory": "La atención construye combinaciones de valores según compatibilidad entre consultas y claves. Un transformer añade mecanismos de posición, capas feed-forward, residuales y normalización. Un modelo autorregresivo factoriza una secuencia en probabilidades del siguiente token; generar texto probable no equivale a garantizar que sus afirmaciones sean verdaderas.\n\nPreentrenamiento aprende regularidades de un corpus; adaptación ajusta comportamiento o tarea; prompting condiciona la entrada; RAG incorpora documentos recuperados. Ninguna técnica elimina automáticamente errores. RAG requiere segmentación, índices, recuperación, posible reranking y generación con evidencia. Un fallo puede originarse en documentos, permisos, búsqueda, selección de fragmentos o respuesta final.\n\nLa evaluación separa relevancia de recuperación, cobertura de evidencia, fidelidad, corrección y utilidad. Citar un documento no demuestra que sostenga la afirmación. Los textos recuperados son datos no confiables: instrucciones dentro de ellos no deben convertirse en autorización para ejecutar acciones. Herramientas con escritura requieren controles fuera del texto generado.\n\nLos modelos generativos no son solo lenguaje: VAE aprende una distribución latente mediante una cota variacional; GAN usa competencia entre generador y discriminador; difusión aprende a revertir un proceso de ruido. Cada familia tiene compromisos de entrenamiento, muestreo y evaluación. Calidad perceptual no prueba fidelidad científica ni ausencia de memorización.",
+      "formula": "Attention(Q,K,V)=softmax(QKᵀ/√dₖ)V. Autorregresión: P(x₁:T)=∏ₜP(xₜ|x<ₜ).",
+      "example": "Un asistente recupera una política de 2024 y responde sobre 2026. Puede citar perfectamente el documento equivocado. La fecha de vigencia y el filtro de versión son parte de la recuperación, no un detalle cosmético.",
+      "pitfall": "Equiparar fluidez y verdad; evaluar RAG solo con un juez automático; permitir que documentos dicten acciones; presentar datos generados como mediciones.",
+      "exercise": "Si un RAG responde mal, ¿cómo distinguir un error de recuperación de uno de generación?",
+      "solution": "Revisa si la evidencia correcta estaba en el corpus y si llegó al contexto. Si no llegó, investiga recuperación; si llegó y la respuesta la contradice u omite, investiga generación y evaluación. Ambos pueden fallar.",
+      "lab": "Construye un RAG local sobre documentos públicos con versiones y preguntas de referencia. Mide recuperación y fidelidad por separado; incluye preguntas sin respuesta y documentos con instrucciones adversas.",
+      "refs": [
+        "attention",
+        "rag",
+        "foundation",
+        "d2l"
+      ]
+    },
+    {
+      "id": "AI07",
+      "area": "Inteligencia artificial",
+      "title": "Aprendizaje por refuerzo y decisión secuencial",
+      "pre": "F03 y DE08",
+      "goals": "Formular MDP; comprender retorno, Bellman y exploración; reconocer límites de aprendizaje offline.",
+      "theory": "El aprendizaje por refuerzo estudia agentes que actúan, reciben recompensas y modifican estados futuros. Un proceso de decisión de Markov especifica estados, acciones, transiciones, recompensas y horizonte o descuento. La propiedad de Markov exige que el estado elegido contenga información suficiente para la dinámica relevante; un resumen parcial puede violarla.\n\nLa función de valor estima retorno futuro de una política; la función Q condiciona además una acción inicial. La ecuación de Bellman descompone valor inmediato y continuación. Métodos temporales actualizan estimaciones sin esperar siempre al final de un episodio. Q-learning aprende sobre acciones óptimas bajo condiciones teóricas que no se trasladan automáticamente a redes profundas y datos arbitrarios.\n\nExploración enfrenta el costo de probar acciones con el valor de aprender. En sistemas de alto impacto no es aceptable suponer experimentación irrestricta. El aprendizaje offline utiliza trayectorias históricas y puede sobrevalorar acciones poco observadas; falta de soporte y cambios de política dificultan evaluación.\n\nLa recompensa representa el objetivo implementado, no toda intención humana. Un agente puede explotar errores del simulador o mejorar una cifra sacrificando consecuencias omitidas. Antes de aumentar complejidad, compara con políticas simples y planificación con restricciones. Un resultado en simulación necesita validación de dinámica y evaluación externa antes de extrapolar.",
+      "formula": "Q*(s,a)=E[r+γ maxₐ′Q*(s′,a′)|s,a]. Actualización tabular: Q←Q+α[r+γmaxQ(s′,·)−Q].",
+      "example": "Con Q=2, recompensa 1, γ=0.9, mejor Q futuro=4 y α=0.5, objetivo=4.6 y nuevo Q=2+0.5(4.6−2)=3.3.",
+      "pitfall": "Confundir recompensa alta con conducta deseada; evaluar en el mismo simulador sin revisar errores; aprender acciones sin soporte de datos.",
+      "exercise": "¿Por qué un bandit contextual no equivale a un MDP general? ¿Qué simplificación hace?",
+      "solution": "El bandit contextual normalmente optimiza recompensa de la acción actual sin modelar que esa acción cambie estados y oportunidades futuras. Un MDP incorpora esas transiciones y efectos acumulados.",
+      "lab": "Implementa bandit y una cuadrícula tabular. Compara reglas, exploración y Q-learning; evalúa con semillas nuevas y una dinámica ligeramente distinta.",
+      "refs": [
+        "sutton",
+        "aima"
+      ]
+    },
+    {
+      "id": "AI08",
+      "area": "Inteligencia artificial",
+      "title": "MLOps, confiabilidad y evaluación responsable",
+      "pre": "AE08 y AI01–AI07",
+      "goals": "Operar modelos como sistemas; detectar cambios; definir evidencia, límites y controles de actualización.",
+      "theory": "Un modelo desplegado depende de datos, features, código, infraestructura, usuarios y políticas. Versionar solo pesos no permite reproducir una predicción. El registro debe conectar entrenamiento, artefacto, configuración, preprocesamiento, datos al corte y evaluación. Entrenamiento y servicio deben compartir semántica de variables.\n\nEl monitoreo distingue cambio de entradas, de relación con el resultado y de objetivos o población. Detectar drift no prueba deterioro; mantener distribuciones parecidas tampoco garantiza buen desempeño. A menudo las etiquetas llegan tarde y están sesgadas por acciones del sistema. Debe definirse cómo obtener evidencia posterior y cuándo suspender o revisar.\n\nShadow evalúa sin gobernar acciones; canary expone una fracción; rollback vuelve a una versión anterior bajo condiciones definidas. Cada estrategia necesita medir consecuencias y compatibilidad. Reentrenar automáticamente no es siempre una mejora: puede amplificar feedback, degradar un subgrupo o absorber errores de captura.\n\nLas fichas de modelo describen propósito, datos, métricas, límites y usos excluidos por evidencia insuficiente. Robustez, privacidad, equidad y explicabilidad son dimensiones distintas. Una explicación local no demuestra causalidad ni justifica una decisión por sí sola. La responsabilidad incluye quién responde ante fallos y qué mecanismos de revisión tienen autoridad efectiva.",
+      "formula": "Sistema evaluado = modelo + datos + transformaciones + política de uso + interfaz + operación. Cambiar uno puede invalidar parte de la evidencia previa.",
+      "example": "Un modelo predice ocupación bien, pero una modificación de zona horaria desplaza features un día. Los pesos no cambiaron; el sistema sí. Monitorear solo versión del modelo no detecta la causa.",
+      "pitfall": "Reentrenar por calendario sin evaluación; aceptar una explicación como prueba de equidad; usar benchmark genérico como garantía de funcionamiento local.",
+      "exercise": "¿Qué debe acompañar una solicitud de desplegar una nueva versión? Propón criterios de rechazo.",
+      "solution": "Evaluación comparable con baseline, integridad de datos, rendimiento por grupos pertinentes, límites operativos y plan de reversión. Rechazar ante fuga, violaciones de restricciones, evidencia insuficiente o degradación material no justificada.",
+      "lab": "Proyecto AI: compara dos modelos, documenta partición y calibración, empaqueta inferencia y simula un incidente. Entrega ficha de modelo, monitoreo, rollback y registro de limitaciones.",
+      "refs": [
+        "debt",
+        "foundation",
+        "sklearn"
+      ]
+    }
+  ],
+  "references": {
+    "kimball": {
+      "area": "Analytics engineering",
+      "author": "Kimball y Ross · 2013",
+      "title": "The Data Warehouse Toolkit, 3.ª ed.",
+      "kind": "Libro profesional",
+      "note": "Modelado dimensional, hechos, dimensiones y patrones de negocio.",
+      "url": "https://www.kimballgroup.com/data-warehouse-business-intelligence-resources/books/data-warehouse-dw-toolkit/"
+    },
+    "ddia": {
+      "area": "Analytics engineering",
+      "author": "Martin Kleppmann · 2017",
+      "title": "Designing Data-Intensive Applications",
+      "kind": "Libro técnico",
+      "note": "Compensaciones entre almacenamiento, procesamiento, consistencia y confiabilidad.",
+      "url": "https://martin.kleppmann.com/2017/03/27/designing-data-intensive-applications.html"
+    },
+    "analyticsbook": {
+      "area": "Analytics engineering",
+      "author": "Machado y Russa",
+      "title": "Analytics Engineering with SQL and dbt",
+      "kind": "Libro práctico",
+      "note": "Productos de datos y transformaciones con SQL y dbt.",
+      "url": "https://www.oreilly.com/library/view/analytics-engineering-with/9781098142377/"
+    },
+    "spark": {
+      "area": "Analytics engineering",
+      "author": "Armbrust et al. · 2015",
+      "title": "Spark SQL: Relational Data Processing in Spark",
+      "kind": "Artículo · SIGMOD",
+      "note": "Procesamiento relacional en Spark y optimización mediante Catalyst.",
+      "url": "https://amplab.cs.berkeley.edu/publication/spark-sql-relational-data-processing-in-spark/"
+    },
+    "lakehouse": {
+      "area": "Analytics engineering",
+      "author": "Armbrust et al. · 2021",
+      "title": "Lakehouse: A New Generation of Open Platforms that Unify Data Warehousing and Advanced Analytics",
+      "kind": "Artículo · CIDR",
+      "note": "Propuesta de arquitectura para reunir capacidades de warehouse y lake.",
+      "url": "https://www.vldb.org/cidrdb/2021/lakehouse-a-new-generation-of-open-platforms-that-unify-data-warehousing-and-advanced-analytics.html"
+    },
+    "howard": {
+      "area": "Decision engineering",
+      "author": "Ronald Howard · 1988",
+      "title": "Decision Analysis: Practice and Promise",
+      "kind": "Artículo",
+      "note": "Fundamentos y calidad del proceso de decisión.",
+      "url": "https://pubsonline.informs.org/doi/abs/10.1287/mnsc.34.6.679"
+    },
+    "boyd": {
+      "area": "Decision engineering",
+      "author": "Boyd y Vandenberghe · 2004",
+      "title": "Convex Optimization",
+      "kind": "Libro · texto del autor",
+      "note": "Formulación matemática, restricciones, convexidad y optimización.",
+      "url": "https://stanford.edu/~boyd/cvxbook/"
+    },
+    "bertsimas": {
+      "area": "Decision engineering",
+      "author": "Bertsimas y Kallus · 2020",
+      "title": "From Predictive to Prescriptive Analytics",
+      "kind": "Artículo",
+      "note": "Conexión formal entre aprendizaje a partir de datos y elección de acciones.",
+      "url": "https://dspace.mit.edu/entities/publication/a7a1f90f-cb44-498d-ba81-bda4d028f608"
+    },
+    "whatif": {
+      "area": "Decision engineering",
+      "author": "Hernán y Robins",
+      "title": "Causal Inference: What If",
+      "kind": "Libro · texto del autor",
+      "note": "Intervenciones, confusión, contrafactuales y datos longitudinales.",
+      "url": "https://miguelhernan.org/whatifbook"
+    },
+    "dmn": {
+      "area": "Decision engineering",
+      "author": "Object Management Group",
+      "title": "Decision Model and Notation · DMN 1.5 (referencia fijada)",
+      "kind": "Estándar técnico",
+      "note": "Representación formal de decisiones y lógica. No es un artículo académico.",
+      "url": "https://www.omg.org/spec/DMN/1.5/"
+    },
+    "biomed": {
+      "area": "Life science informatics",
+      "author": "Shortliffe, Cimino y Chiang, eds. · 2021",
+      "title": "Biomedical Informatics, 5.ª ed.",
+      "kind": "Libro",
+      "note": "Marco de informática biomédica, clínica y de investigación.",
+      "url": "https://link.springer.com/book/10.1007/978-3-030-58721-5"
+    },
+    "durbin": {
+      "area": "Life science informatics",
+      "author": "Durbin, Eddy, Krogh y Mitchison · 1998",
+      "title": "Biological Sequence Analysis",
+      "kind": "Libro",
+      "note": "Alineamientos y modelos probabilísticos para proteínas y ácidos nucleicos.",
+      "url": "https://eddylab.org/cupbook.html"
+    },
+    "fair": {
+      "area": "Life science informatics",
+      "author": "Wilkinson et al. · 2016",
+      "title": "The FAIR Guiding Principles for scientific data management and stewardship",
+      "kind": "Artículo",
+      "note": "Datos encontrables, accesibles, interoperables y reutilizables.",
+      "url": "https://www.nature.com/articles/sdata201618"
+    },
+    "mimic": {
+      "area": "Life science informatics",
+      "author": "Johnson et al. · 2023",
+      "title": "MIMIC-IV, a freely accessible electronic health record dataset",
+      "kind": "Artículo · datos clínicos",
+      "note": "Investigación reproducible con datos clínicos. El acceso exige formación y condiciones de uso.",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9810617/"
+    },
+    "ohdsi": {
+      "area": "Life science informatics",
+      "author": "OHDSI",
+      "title": "The Book of OHDSI · OMOP Common Data Model",
+      "kind": "Documentación",
+      "note": "Estructuras y vocabularios comunes para datos observacionales de salud.",
+      "url": "https://ohdsi.github.io/TheBookOfOhdsi/CommonDataModel.html"
+    },
+    "alphafold": {
+      "area": "Life science informatics",
+      "author": "Jumper et al. · 2021",
+      "title": "Highly accurate protein structure prediction with AlphaFold",
+      "kind": "Artículo",
+      "note": "Aplicación fundamental de aprendizaje profundo a estructura de proteínas.",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8371605/"
+    },
+    "aima": {
+      "area": "Inteligencia artificial",
+      "author": "Russell y Norvig",
+      "title": "Artificial Intelligence: A Modern Approach, 4.ª ed.",
+      "kind": "Libro",
+      "note": "Panorama de búsqueda, razonamiento, planificación, aprendizaje y decisiones.",
+      "url": "https://aima.cs.berkeley.edu/"
+    },
+    "isl": {
+      "area": "Inteligencia artificial",
+      "author": "James, Witten, Hastie, Tibshirani y Taylor · 2023",
+      "title": "An Introduction to Statistical Learning: with Applications in Python",
+      "kind": "Libro",
+      "note": "Entrada al aprendizaje estadístico con práctica en Python.",
+      "url": "https://link.springer.com/book/10.1007/978-3-031-38747-0"
+    },
+    "deep": {
+      "area": "Inteligencia artificial",
+      "author": "Goodfellow, Bengio y Courville · 2016",
+      "title": "Deep Learning",
+      "kind": "Libro · texto de los autores",
+      "note": "Fundamentos matemáticos y metodológicos de redes profundas.",
+      "url": "https://www.deeplearningbook.org/"
+    },
+    "attention": {
+      "area": "Inteligencia artificial",
+      "author": "Vaswani et al. · 2017",
+      "title": "Attention Is All You Need",
+      "kind": "Artículo",
+      "note": "Arquitectura transformer y mecanismos de atención.",
+      "url": "https://arxiv.org/abs/1706.03762"
+    },
+    "rag": {
+      "area": "Inteligencia artificial",
+      "author": "Lewis et al. · 2020",
+      "title": "Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks",
+      "kind": "Artículo",
+      "note": "Integración de generación y recuperación de información externa.",
+      "url": "https://arxiv.org/abs/2005.11401"
+    },
+    "debt": {
+      "area": "Inteligencia artificial",
+      "author": "Sculley et al. · 2015",
+      "title": "Hidden Technical Debt in Machine Learning Systems",
+      "kind": "Artículo",
+      "note": "Mantenimiento y dependencias que rodean al modelo.",
+      "url": "https://research.google/pubs/hidden-technical-debt-in-machine-learning-systems/"
+    },
+    "foundation": {
+      "area": "Inteligencia artificial",
+      "author": "Bommasani et al. · 2021",
+      "title": "On the Opportunities and Risks of Foundation Models",
+      "kind": "Informe de investigación",
+      "note": "Capacidades, aplicaciones y riesgos de los modelos fundacionales.",
+      "url": "https://arxiv.org/abs/2108.07258"
+    },
+    "mml": {
+      "area": "Fundamentos",
+      "author": "Deisenroth, Faisal y Ong · 2020",
+      "title": "Mathematics for Machine Learning",
+      "kind": "Libro · autores",
+      "note": "Álgebra, cálculo, probabilidad y conexiones con aprendizaje.",
+      "url": "https://mml-book.github.io/"
+    },
+    "murphy": {
+      "area": "Inteligencia artificial",
+      "author": "Kevin P. Murphy · 2022 / 2023",
+      "title": "Probabilistic Machine Learning: Introduction / Advanced Topics",
+      "kind": "Libros · autor",
+      "note": "Dos volúmenes para profundizar desde fundamentos hasta modelos avanzados.",
+      "url": "https://probml.github.io/"
+    },
+    "cmu": {
+      "area": "Analytics engineering",
+      "author": "Carnegie Mellon University",
+      "title": "15-445/645 · Database Systems",
+      "kind": "Curso universitario",
+      "note": "Material de sistemas de bases de datos: almacenamiento, consultas y transacciones.",
+      "url": "https://15445.courses.cs.cmu.edu/fall2026/"
+    },
+    "prisma": {
+      "area": "Fundamentos",
+      "author": "PRISMA · 2020",
+      "title": "PRISMA 2020 Statement",
+      "kind": "Guía de reporte",
+      "note": "Reporte de revisiones sistemáticas; no reemplaza un diseño de revisión válido.",
+      "url": "https://www.prisma-statement.org/prisma-2020-statement"
+    },
+    "fhir": {
+      "area": "Life science informatics",
+      "author": "HL7 International",
+      "title": "FHIR R5 · Overview and Observation",
+      "kind": "Estándar técnico",
+      "note": "Referencia de intercambio; comprobar versión, perfiles y contexto de implementación.",
+      "url": "https://hl7.org/fhir/overview.html"
+    },
+    "omop": {
+      "area": "Life science informatics",
+      "author": "OHDSI",
+      "title": "OMOP Common Data Model",
+      "kind": "Especificación y documentación",
+      "note": "Modelado estandarizado para datos observacionales.",
+      "url": "https://ohdsi.github.io/CommonDataModel/"
+    },
+    "cohorts": {
+      "area": "Life science informatics",
+      "author": "OHDSI",
+      "title": "The Book of OHDSI · Defining Cohorts",
+      "kind": "Libro abierto",
+      "note": "Conceptos y herramientas para definiciones ejecutables de cohortes.",
+      "url": "https://ohdsi.github.io/TheBookOfOhdsi/Cohorts.html"
+    },
+    "scipyopt": {
+      "area": "Decision engineering",
+      "author": "SciPy contributors",
+      "title": "scipy.optimize · Optimization and root finding",
+      "kind": "Documentación técnica",
+      "note": "Referencia de solvers; registrar versión y revisar supuestos de cada método.",
+      "url": "https://docs.scipy.org/doc/scipy/reference/optimize.html"
+    },
+    "deseq": {
+      "area": "Life science informatics",
+      "author": "Love, Huber, Anders y colaboradores",
+      "title": "Analyzing RNA-seq data with DESeq2",
+      "kind": "Vignette oficial",
+      "note": "Tutorial técnico de análisis de conteos y expresión diferencial.",
+      "url": "https://bioconductor.org/packages/release/bioc/vignettes/DESeq2/inst/doc/DESeq2.html"
+    },
+    "ebi": {
+      "area": "Life science informatics",
+      "author": "EMBL-EBI Training",
+      "title": "RNA-sequence analysis",
+      "kind": "Material de formación",
+      "note": "Temas y formación en transcriptómica y análisis reproducible.",
+      "url": "https://www.ebi.ac.uk/training/events/rna-sequence-analysis/"
+    },
+    "blast": {
+      "area": "Life science informatics",
+      "author": "NCBI",
+      "title": "BLAST Glossary",
+      "kind": "Documentación técnica",
+      "note": "Terminología de búsqueda y comparación de secuencias.",
+      "url": "https://www.ncbi.nlm.nih.gov/books/NBK62051/"
+    },
+    "survival": {
+      "area": "Life science informatics",
+      "author": "scikit-survival contributors",
+      "title": "Introduction to Survival Analysis",
+      "kind": "Documentación y tutorial",
+      "note": "Práctica computacional de censura y modelos de supervivencia.",
+      "url": "https://scikit-survival.readthedocs.io/en/stable/user_guide/00-introduction.html"
+    },
+    "tripod": {
+      "area": "Life science informatics",
+      "author": "TRIPOD collaboration",
+      "title": "TRIPOD+AI",
+      "kind": "Guía de reporte",
+      "note": "Reporte transparente de estudios de modelos de predicción.",
+      "url": "https://www.tripod-statement.org/"
+    },
+    "tripodllm": {
+      "area": "Life science informatics",
+      "author": "Gallifant et al. · 2025",
+      "title": "The TRIPOD-LLM reporting guideline for studies using large language models",
+      "kind": "Artículo · guía",
+      "note": "Reporte de estudios de LLM en contextos biomédicos.",
+      "url": "https://www.nature.com/articles/s41591-024-03425-5"
+    },
+    "sklearn": {
+      "area": "Inteligencia artificial",
+      "author": "scikit-learn contributors",
+      "title": "Common pitfalls and recommended practices",
+      "kind": "Documentación oficial",
+      "note": "Preprocesamiento, fuga de información y ejecución coherente.",
+      "url": "https://scikit-learn.org/stable/common_pitfalls.html"
+    },
+    "sklearncv": {
+      "area": "Inteligencia artificial",
+      "author": "scikit-learn contributors",
+      "title": "Cross-validation: evaluating estimator performance",
+      "kind": "Documentación oficial",
+      "note": "Diseños y límites de validación de estimadores.",
+      "url": "https://scikit-learn.org/stable/modules/cross_validation.html"
+    },
+    "sutton": {
+      "area": "Decision engineering",
+      "author": "Sutton y Barto · 2018",
+      "title": "Reinforcement Learning: An Introduction, 2.ª ed.",
+      "kind": "Libro",
+      "note": "Fundamentos de aprendizaje y decisión secuencial.",
+      "url": "https://mitpress.mit.edu/9780262039246/reinforcement-learning/"
+    },
+    "d2l": {
+      "area": "Inteligencia artificial",
+      "author": "Zhang, Lipton, Li y Smola",
+      "title": "Dive into Deep Learning",
+      "kind": "Libro interactivo",
+      "note": "Fundamentos y práctica de redes profundas y atención.",
+      "url": "https://d2l.ai/"
+    }
+  }
+}

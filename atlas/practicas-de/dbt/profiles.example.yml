@@ -1,0 +1,14 @@
+# Copia como profiles.yml FUERA del repositorio o úsalo con --profiles-dir.
+# Instala dbt-core y dbt-postgres compatibles en un entorno aislado.
+atlas_de:
+  target: dev
+  outputs:
+    dev:
+      type: postgres
+      host: "{{ env_var('DBT_HOST', 'localhost') }}"
+      user: "{{ env_var('DBT_USER') }}"
+      password: "{{ env_var('DBT_PASSWORD') }}"
+      port: 5432
+      dbname: "{{ env_var('DBT_DATABASE') }}"
+      schema: atlas_practica
+      threads: 2

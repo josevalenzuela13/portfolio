@@ -724,3 +724,7 @@ if 'id="programa-avanzado"' not in base:
 (ROOT/'content/curriculum.json').write_text(json.dumps(dict(modules=modules,references=refs),ensure_ascii=False,indent=2))
 text_words=len(re.findall(r'\b\w+\b',' '.join(' '.join(str(v) for v in m.values()) for m in modules)))
 print(json.dumps(dict(modules=len(modules),references=len(refs),lesson_words=text_words,html_bytes=len(body.encode())),ensure_ascii=False))
+# Reapply the Data Engineering extension when rebuilding the base curriculum.
+if (ROOT/'content/build_data_engineering.py').exists():
+ import subprocess, sys
+ subprocess.run([sys.executable,str(ROOT/'content/build_data_engineering.py')],check=True)

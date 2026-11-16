@@ -296,3 +296,7 @@ with zipfile.ZipFile(OUT/'practicas-ingenieria-datos.zip','w',zipfile.ZIP_DEFLAT
   if p.is_file() and '__pycache__' not in p.parts and p.suffix not in ('.pyc','.db') and p.name not in ('profiles.yml','.env'):
    z.write(p, 'practicas-de/'+p.relative_to(OUT/'practicas-de').as_posix())
 print(json.dumps(dict(units=len(modules),hours=HOURS,resources=len(refs),html_bytes=(OUT/'ingenieria-datos.html').stat().st_size)))
+# Reapply transversal language navigation after regenerating the DE route.
+if (ROOT/'content/build_languages.py').exists():
+ import subprocess, sys
+ subprocess.run([sys.executable,str(ROOT/'content/build_languages.py')],check=True)

@@ -1,0 +1,7 @@
+{
+  "enabled": true,
+  "timezone": "America/Guatemala",
+  "notify_user": "josevalenzuela13",
+  "mode": "week_default",
+  "end": "2027-12-31"
+}

@@ -71,3 +71,22 @@ son síntesis opcional del navegador: requieren una voz compatible y no evalúan
 pronunciación. Las notas y borradores se conservan por dominio/navegador y pueden
 exportarse/importarse; no se envían a GitHub. El sitio no graba ni pide micrófono.
 Las actividades son práctica de autoestudio y no acreditan un nivel CEFR.
+
+## Rutina hasta diciembre 2027
+
+- `rutina.html`, `routine.js`, `plan-core.js`: dashboard estático y lógica pura.
+- `plan-aprendizaje.json`: 59 semanas y 881 sesiones, 16/11/2026 a 31/12/2027.
+- `rutina-2026-2027.md`: plan completo legible sin JavaScript.
+- `rutina-2026-2027.ics` y `rutina-minima-2026-2027.ics`: calendarios con alarmas.
+- `tracking/`: configuración de avisos, semilla de progreso e instrucciones.
+- `content/build_routine.py` y `content/routine_template.html`: generador y plantilla.
+
+En el checkout de Sites, `github/` conserva archivos que se publican en la raíz
+del repositorio GitHub: `.github/workflows/atlas-learning.yml`, `scripts/` y
+`tests/`. No son parte de la carpeta estática dist. La rutina se reaplica al
+regenerar las rutas previas. El generador no sobreescribe progreso/configuración
+si esos archivos ya existen.
+
+El cron requiere main y Actions permitido. Los recordatorios escriben Issues,
+no commits a main. No utilizan SMTP, servicios pagos ni secretos personales.
+No se promete entrega exacta a correo: depende de GitHub y sus notificaciones.

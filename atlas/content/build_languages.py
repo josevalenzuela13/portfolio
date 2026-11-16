@@ -293,3 +293,7 @@ for name in ['maestria.html','ingenieria-datos.html']:
  if 'data-languages-nav' not in s:
   s=s.replace('</nav>','<a data-languages-nav href="idiomas.html">Idiomas · inglés y alemán</a></nav>',1);p.write_text(s)
 print(json.dumps(dict(english_units=8,german_units=12,phrase_cards=80,short_exercises=40,resources=len(resources))))
+# Keep the dated routine entry points after regenerating language pages.
+if (ROOT/'content/build_routine.py').exists():
+ import subprocess, sys
+ subprocess.run([sys.executable,str(ROOT/'content/build_routine.py')],check=True)

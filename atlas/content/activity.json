@@ -1,0 +1,36 @@
+{
+  "start": "2027-01-01",
+  "schedule": [
+    {
+      "key": "swim",
+      "days": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "label": "Natación",
+      "minutes": 30,
+      "instruction": "Nadar 30 minutos. Lunes y miércoles suaves o de técnica; martes y jueves a intensidad moderada. Aumentar gradualmente si todavía no toleras cuatro días."
+    },
+    {
+      "key": "strength",
+      "days": [
+        0,
+        4
+      ],
+      "label": "Fuerza · clase o kettlebell",
+      "minutes": 40,
+      "instruction": "Elegir una clase funcional de pesas de 40 minutos O una sesión en casa con kettlebells de 8 y 12 kg; no sumar ambas. En casa: sentadilla, peso muerto, remo, flexiones adaptadas o press y caminata con pesa; 2–3 series, técnica controlada y unas dos repeticiones en reserva. Registrar carga y repeticiones para progresar. Lunes: natación suave, preferiblemente separada de la fuerza. El sábado puede sustituir al viernes; no es una tercera sesión obligatoria."
+    },
+    {
+      "key": "walk",
+      "days": [
+        5
+      ],
+      "label": "Caminata",
+      "minutes": 60,
+      "instruction": "Caminar 60 minutos a ritmo cómodo a moderado. Si haces fuerza hoy en sustitución del viernes, registra el cambio en la sesión del viernes; no dupliques la carga."
+    }
+  ]
+}

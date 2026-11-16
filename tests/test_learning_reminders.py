@@ -78,5 +78,24 @@ class ReminderTests(unittest.TestCase):
         week=self.plan['weeks'][5];self.assertEqual(r.mode_for(self.config,week),'minimum')
         self.assertTrue(all(t['minimum_minutes']>0 for t in r.week_tasks(self.plan,week,self.config)))
 
+    def test_exercise_checkboxes_suppress_daily_reminders(self):
+        day=date(2027,1,4)
+        week=r.choose_week(self.plan,day)
+        tasks=[t for t in r.week_tasks(self.plan,week,self.config) if t['date']==day.isoformat()]
+        self.assertEqual(len([t for t in tasks if t['kind']=='activity']),2)
+        body=r.marker(self.plan,week)+'\n'+'\n'.join('- [x] `'+t['id']+'`' for t in tasks)
+        c=Fake([dict(number=1,state='open',body=body)])
+        r.deliver(c,self.plan,self.config,day)
+        self.assertEqual(c.posts,[])
+        self.assertEqual(len(r.checked_ids(body)),len(tasks))
+
+    def test_activity_budget_separate_and_dates_bounded(self):
+        w=next(w for w in self.plan['weeks'] if w['start']=='2027-01-04')
+        self.assertEqual(w['normal_minutes'],540)
+        self.assertEqual(w['activity_normal_minutes'],260)
+        activity=[t for t in self.plan['tasks'] if t['kind']=='activity']
+        self.assertEqual(len(activity),365)
+        self.assertTrue(all(t['time'] is None and '2027-01-01'<=t['date']<='2027-12-31' for t in activity))
+
 
 if __name__=='__main__':unittest.main()

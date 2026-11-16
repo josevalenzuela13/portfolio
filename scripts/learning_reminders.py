@@ -52,7 +52,7 @@ def week_tasks(plan, week, config):
 
 
 def checked_ids(body):
-    return set(re.findall(r'^- \[[xX]\] `(AT-\d{4}-\d{2}-\d{2}-(?:tech|en|de|review))`', body or '', re.M))
+    return set(re.findall(r'^- \[[xX]\] `(AT-\d{4}-\d{2}-\d{2}-(?:tech|en|de|review|swim|strength|walk))`', body or '', re.M))
 
 
 def body_for(plan, week, config):
@@ -143,7 +143,7 @@ def deliver(client, plan, config, today):
     if any(daily in (c.get('body') or '') for c in client.pages(f'/issues/{issue["number"]}/comments')):
         return 'Sin envío: esta fecha ya fue notificada.'
     mode = mode_for(config, week)
-    lines = [daily, '@' + user + ' · Tu aprendizaje de hoy (' + today.isoformat() + ')', '']
+    lines = [daily, '@' + user + ' · Tu plan de hoy (' + today.isoformat() + ')', '']
     for t in pending:
         lines.append(f'- {t[mode + "_minutes"]} min · [{t["label"]}]({plan["site_url"] + t["url"]})')
     lines += ['', '[Abrir rutina](' + plan['site_url'] + 'rutina.html#week=' + str(week['number']) + ')',

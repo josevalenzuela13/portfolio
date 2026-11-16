@@ -65,6 +65,18 @@ for n in range(1,60):
  week['normal_minutes']=sum(t['normal_minutes'] for t in tasks if t['week']==n)
  week['minimum_minutes']=sum(t['minimum_minutes'] for t in tasks if t['week']==n)
  weeks.append(week)
+# Actividad física de 2027: sin asignar horas ni modificar el presupuesto académico.
+activity=json.loads((ROOT/'content/activity.json').read_text())
+for w in weeks:
+ w['activity_normal_minutes']=0;w['activity_minimum_minutes']=0
+ for day in range((date.fromisoformat(w['end'])-date.fromisoformat(w['start'])).days+1):
+  d=date.fromisoformat(w['start'])+timedelta(days=day)
+  if d.isoformat()<activity['start']:continue
+  for item in activity['schedule']:
+   if d.weekday() not in item['days']:continue
+   t=dict(id=f'AT-{d.isoformat()}-{item["key"]}',date=d.isoformat(),week=w['number'],kind='activity',unit=None,label=item['label'],instruction=item['instruction'],url='rutina.html#actividad',normal_minutes=item['minutes'],minimum_minutes=item['minutes'],time=None)
+   tasks.append(t);w['task_ids'].append(t['id'])
+   w['activity_normal_minutes']+=item['minutes'];w['activity_minimum_minutes']+=item['minutes']
 plan=dict(id='atlas-2026-2027-v1',version=1,start=START.isoformat(),end=END.isoformat(),timezone=ZONE,repository='josevalenzuela13/portfolio',site_url=BASE,phases=phases,weeks=weeks,tasks=tasks,modules={k:dict(id=k,title=m['title'],url=m['url']) for k,m in modules.items()})
 (OUT/'plan-aprendizaje.json').write_text(json.dumps(plan,ensure_ascii=False,indent=2))
 # Seed files are never overwritten once user tracking/configuration exists.
@@ -87,6 +99,10 @@ def calendar(mode='normal'):
   w=weeks[t['week']-1];use='minimum' if w['default_mode']=='minimum' else mode
   minutes=t[use+'_minutes']
   if not minutes:continue
+  if t['kind']=='activity':
+   d=date.fromisoformat(t['date'])
+   lines.extend(['BEGIN:VEVENT','UID:'+t['id']+'@atlas-josevalenzuela13','DTSTAMP:20261116T120000Z','DTSTART;VALUE=DATE:'+d.strftime('%Y%m%d'),'DTEND;VALUE=DATE:'+(d+timedelta(days=1)).strftime('%Y%m%d'),'SUMMARY:'+escape_ics(t['label']),'DESCRIPTION:'+escape_ics(t['instruction']+'\nSin hora fija; duración prevista: '+str(minutes)+' min.\n'+BASE+t['url']),'END:VEVENT'])
+   continue
   start=datetime.fromisoformat(t['date']+'T'+t['time']).replace(tzinfo=ZoneInfo(ZONE)).astimezone(timezone.utc)
   end=start+timedelta(minutes=minutes)
   lines.extend(['BEGIN:VEVENT','UID:'+t['id']+'@atlas-josevalenzuela13','DTSTAMP:20261116T120000Z','DTSTART:'+start.strftime('%Y%m%dT%H%M%SZ'),'DTEND:'+end.strftime('%Y%m%dT%H%M%SZ'),'SUMMARY:'+escape_ics(t['label']),'DESCRIPTION:'+escape_ics(t['instruction']+'\n'+BASE+'rutina.html#week='+str(t['week'])+'\nRecurso: '+BASE+t['url']),'BEGIN:VALARM','TRIGGER:-PT10M','ACTION:DISPLAY','DESCRIPTION:Atlas · sesión de aprendizaje','END:VALARM','END:VEVENT'])
@@ -97,7 +113,7 @@ def calendar(mode='normal'):
 md=['# Atlas · Rutina del 16 noviembre 2026 al 31 diciembre 2027\n','59 semanas. Semana normal: 6 h técnicas + 1 h inglés + 1 h 30 alemán + 30 min revisión = 9 h. Semana mínima: 3 h técnicas + 30 min inglés + 40 min alemán + 20 min revisión = 4 h 30. Semanas 6, 7, 58 y 59 ligeras. La última termina el viernes.\n','La primera prioridad es construir evidencia técnica antes de julio 2027. Las unidades F/AE son puentes de repaso; las semanas de decisiones, IA y ciencias de la vida son exploraciones guiadas, no dominio de toda su literatura. No se garantiza nivel de idioma por fecha.\n']
 for w in weeks:
  md.extend([f'## Semana {w["number"]}: {w["start"]} — {w["end"]}\n',f'**{w["title"]} · {w["stage"]}**\n',w['goal']+'\n',f'Principal: [{w["primary"]}]({BASE+modules[w["primary"]]["url"]}). Inglés: {w["english"]}. Alemán: {w["german"]}. Puentes: {", ".join(w["related"])}.\n','Evidencia: '+w['accept']+'\n'])
- for t in [t for t in tasks if t['week']==w['number']]:md.append(f'- [ ] `{t["id"]}` {t["date"]} {t["time"]} · {t["normal_minutes"]} min / mínimo {t["minimum_minutes"]} · {t["label"]}. {t["instruction"]}\n')
+ for t in [t for t in tasks if t['week']==w['number']]:md.append(f'- [ ] `{t["id"]}` {t["date"]} {t["time"] or "Sin hora fija"} · {t["normal_minutes"]} min / mínimo {t["minimum_minutes"]} · {t["label"]}. {t["instruction"]}\n')
 (OUT/'rutina-2026-2027.md').write_text('\n'.join(md))
 print(json.dumps(dict(weeks=len(weeks),tasks=len(tasks),start=plan['start'],end=plan['end'],normal_minutes=sum(w['normal_minutes'] for w in weeks))))
 # Static shell + separately testable pure logic; data loaded from same origin.

@@ -97,3 +97,11 @@ La validación local no demuestra entrega real del correo: compruébala al activ
 - https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows
 - https://docs.github.com/en/subscriptions-and-notifications/get-started/configuring-notifications
 - https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api
+
+## Actividad física integrada · 2027
+
+Desde el 01/01/2027, `content/activity.json` agrega natación lunes–jueves (30 min), fuerza lunes y viernes (40 min, clase o kettlebell) y caminata sábado (60 min). El sábado puede sustituir al viernes; no se agrega como tercera sesión obligatoria. Las horas de entrenamiento no se han acordado: no se inventan ni se desplazan con el horario de estudio. Los ICS usan eventos de día completo sin alarma para ejercicio.
+
+Ejecuta `python atlas/content/build_routine.py` desde la raíz del repositorio para regenerar el plan y sus archivos. Los presupuestos de estudio se conservan; `activity_normal_minutes` y `activity_minimum_minutes` registran el ejercicio por separado. La modalidad mínima reduce el estudio, no prescribe una reducción automática del ejercicio.
+
+El mismo workflow y los mismos horarios de aviso incluyen las sesiones físicas pendientes. Las casillas de IDs swim/strength/walk se reconocen en el bot y en la lectura de Issues del sitio. Esto no convierte la web en un editor de Issues ni automatiza las notas o minutos. No se necesita una tarea nueva en ChatGPT. Las semanas anteriores a enero quedan sin cambios de actividad.

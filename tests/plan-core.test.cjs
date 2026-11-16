@@ -9,7 +9,26 @@ test('newer status preserves local notes and minutes when source lacks them',()=
 test('older source cannot overwrite newer local state',()=>{const local={a:{status:'done',updatedAt:'2026-11-17T10:00:00Z'}};assert.equal(C.mergeEntries(local,{a:{status:'pending',updatedAt:'2026-11-16T10:00:00Z'}}).a.status,'done');});
 test('closed issue never implies completion; explicit checkboxes do',()=>{const body='<!-- atlas-plan:'+plan.id+' week:1 -->\n- [ ] `'+task.id+'` texto';const incoming=C.issueEntries(plan,[{state:'closed',updated_at:'2026-11-16T11:00:00Z',body}]);assert.equal(incoming[task.id].status,'pending');});
 test('ignore unrelated issues, PRs and unknown checklist IDs',()=>{assert.deepEqual(C.issueEntries(plan,[{body:'- [x] `'+task.id+'`',updated_at:'2026-11-16T11:00:00Z'}]),{});const body='<!-- atlas-plan:'+plan.id+' week:1 -->\n- [x] `AT-1900-01-01-tech`';assert.deepEqual(C.issueEntries(plan,[{body,updated_at:'2026-11-16T11:00:00Z'}]),{});});
-test('calendar event IDs stable, alarms present, last date bounded',()=>{const s=C.sanitize(plan,null).settings,ics=C.calendar(plan,'auto',s);const ids=[...ics.matchAll(/^UID:(.+)$/gm)].map(m=>m[1].trim());assert.equal(ids.length,new Set(ids).size);assert.equal((ics.match(/BEGIN:VALARM/g)||[]).length,ids.length);assert.ok(ics.includes('DTSTART:20261117T013000Z'));for(const m of ics.matchAll(/^DTSTART:(\d{4})(\d\d)(\d\d)T(\d\d)(\d\d)(\d\d)Z/gm)){const utc=Date.UTC(+m[1],+m[2]-1,+m[3],+m[4],+m[5],+m[6]);const local=new Date(utc-6*3600000).toISOString().slice(0,10);assert.ok(local>=plan.start&&local<=plan.end);}assert.ok(ics.includes('DTSTART:20280101T')); });
+test('calendar event IDs stable, alarms present, last date bounded',()=>{const s=C.sanitize(plan,null).settings,ics=C.calendar(plan,'auto',s);const ids=[...ics.matchAll(/^UID:(.+)$/gm)].map(m=>m[1].trim());assert.equal(ids.length,new Set(ids).size);assert.equal((ics.match(/BEGIN:VALARM/g)||[]).length,ids.length-plan.tasks.filter(t=>t.kind==='activity').length);assert.ok(ics.includes('DTSTART:20261117T013000Z'));for(const m of ics.matchAll(/^DTSTART:(\d{4})(\d\d)(\d\d)T(\d\d)(\d\d)(\d\d)Z/gm)){const utc=Date.UTC(+m[1],+m[2]-1,+m[3],+m[4],+m[5],+m[6]);const local=new Date(utc-6*3600000).toISOString().slice(0,10);assert.ok(local>=plan.start&&local<=plan.end);}assert.ok(ics.includes('DTSTART:20280101T')); });
 test('calendar filtering and durations consistent',()=>{const ics=C.calendar(plan,'minimum',C.sanitize(plan,null).settings,'en',1);assert.equal((ics.match(/BEGIN:VEVENT/g)||[]).length,2);assert.ok(ics.includes('DTSTART:20261118T013000Z'));assert.ok(ics.includes('DTEND:20261118T014500Z'));});
 test('calendar line folding is UTF-8 safe and compliant',()=>{const ics=C.calendar(plan,'auto',C.sanitize(plan,null).settings,'tech',1);for(const line of ics.split('\r\n'))assert.ok(Buffer.byteLength(line,'utf8')<=75);assert.ok(ics.includes('\r\n '));});
 test('calendar time adjustments do not mutate plan or reminder config',()=>{const old=task.time,s={weekday:'18:00',saturday:'10:00',sunday:'15:00'};assert.equal(C.shiftedTime(task,s),'18:00');assert.equal(task.time,old);assert.equal(C.sanitize(plan,{program:plan.id,version:1,settings:{weekday:'99:99'}}).settings.weekday,'19:30');});
+
+test('exercise uses separate budgets and calendars without invented times',()=>{
+ const w=plan.weeks.find(w=>w.start==='2027-01-04'),activity=C.tasksForWeek(plan,w.number,'normal').filter(t=>t.kind==='activity');
+ assert.equal(w.normal_minutes,540);assert.equal(w.activity_normal_minutes,260);
+ assert.equal(activity.length,7);assert.ok(activity.every(t=>t.time===null));
+ assert.ok(plan.tasks.filter(t=>t.kind==='activity').every(t=>t.date>='2027-01-01'&&t.date<=plan.end));
+ assert.equal(C.shiftedTime(activity[0],{weekday:'18:00'}),'Sin hora fija');
+ const ics=C.calendar(plan,'normal',C.sanitize(plan,null).settings,'activity',w.number);
+ assert.equal((ics.match(/BEGIN:VEVENT/g)||[]).length,7);
+ assert.equal((ics.match(/DTSTART;VALUE=DATE:/g)||[]).length,7);
+ assert.equal((ics.match(/VALARM/g)||[]).length,0);
+});
+test('exercise checkboxes sync and preserve local details',()=>{
+ const t=plan.tasks.find(t=>t.kind==='activity'),body='<!-- atlas-plan:'+plan.id+' week:'+t.week+' -->\n- [x] `'+t.id+'`';
+ const incoming=C.issueEntries(plan,[{body,updated_at:'2027-01-05T10:00:00Z'}]);
+ assert.equal(incoming[t.id].status,'done');
+ const state=C.mergeEntries({[t.id]:{note:'8 kg',minutes:40,updatedAt:'2027-01-04T10:00:00Z'}},incoming);
+ assert.equal(state[t.id].note,'8 kg');assert.equal(state[t.id].minutes,40);
+});

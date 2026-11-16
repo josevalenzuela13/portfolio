@@ -1,0 +1,29 @@
+name: Atlas · verificar plan y actividad
+on:
+  pull_request:
+    paths: ['atlas/**', 'scripts/**', 'tests/**', '.github/workflows/atlas-checks.yml']
+  push:
+    branches: [main]
+    paths: ['atlas/**', 'scripts/**', 'tests/**', '.github/workflows/atlas-checks.yml']
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: python -m unittest discover -s tests -p 'test_learning_reminders.py' -v
+      - run: node --test tests/plan-core.test.cjs
+      - name: Regenerar y verificar plan
+        run: |
+          python atlas/content/build_routine.py
+          python -m unittest discover -s tests -p 'test_learning_reminders.py' -v
+          node --test tests/plan-core.test.cjs
+          git diff --exit-code -- atlas/plan-aprendizaje.json atlas/rutina.html atlas/rutina-2026-2027.md

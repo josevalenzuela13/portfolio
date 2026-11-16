@@ -1,0 +1,500 @@
+{
+  "version": 1,
+  "updated": "2026-11-16",
+  "hours": 168,
+  "modules": [
+    {
+      "id": "DE-R01",
+      "title": "Arquitectura Databricks y elección de cómputo",
+      "tag": "Ingeniería de Datos",
+      "hours": 10,
+      "pre": "AE08; SQL básico",
+      "priority": "Primera prioridad",
+      "goal": "Dibujar la plataforma y justificar dónde ejecutar cada carga.",
+      "theory": "Una arquitectura separa almacenamiento persistente, cómputo y gobierno. Un notebook contiene código y resultados; no debe confundirse con el motor que lo ejecuta ni con la tabla que persiste sus datos. Un catálogo ayuda a organizar y controlar objetos; una tabla Delta incorpora metadatos transaccionales sobre archivos. Distinguir estas responsabilidades evita resolver un problema de permisos cambiando el tamaño del cómputo.\n\nAntes de escoger recursos describe la carga: SQL o Python, interactiva o programada, volumen, latencia y requisitos de librerías. Después compara las opciones disponibles en tu workspace. Una recomendación del proveedor no equivale a una regla universal de costo: tiempo de arranque, duración, utilización y restricciones de la nube cambian el resultado. Registra supuestos y conserva evidencia de una ejecución pequeña.\n\nPara tu transición desde analítica, la pregunta de estudio es cómo convertir una consulta que funciona en una carga repetible con recursos, permisos y responsable definidos. No necesitas memorizar todos los botones: debes explicar por qué una elección satisface el caso y qué limitación obligaría a cambiarla.",
+      "exercise": "Un dashboard SQL se consulta durante el día y un ETL Python corre cada noche. ¿Deben compartir exactamente el mismo cómputo?",
+      "answer": "No hay esa obligación. Evalúa un SQL warehouse para consultas y cómputo de Jobs compatible para el ETL; justifica aislamiento, disponibilidad, latencia y costo medido.",
+      "steps": [
+        "Dibuja fuente → almacenamiento → cómputo → tablas → consumidor, marcando Unity Catalog.",
+        "Clasifica seis cargas: BI, notebook exploratorio, ETL diario, streaming, librería especial y backfill.",
+        "Para cada carga compara dos opciones de cómputo y una restricción.",
+        "Ejecuta una consulta sintética pequeña y registra tipo de recurso, tiempo de arranque y ejecución.",
+        "Redacta ADR-001 con elección, alternativa, supuestos y condición de revisión."
+      ],
+      "accept": "Entrega diagrama, matriz de seis casos y ADR. Debes explicar dónde viven los datos al apagar el cómputo y qué depende de tu workspace.",
+      "refs": [
+        "compute",
+        "unity",
+        "exam"
+      ]
+    },
+    {
+      "id": "DE-R02",
+      "title": "Python para pipelines mantenibles",
+      "tag": "Base compartida",
+      "hours": 10,
+      "pre": "F07; Python básico",
+      "priority": "Primera prioridad",
+      "goal": "Pasar de scripts de notebook a funciones con contratos, errores y pruebas.",
+      "theory": "Un pipeline combina lógica de transformación con efectos externos. Separa el cálculo puro de lectura, escritura y autenticación. Esta separación permite probar fechas inválidas o importes negativos sin conectarte a una plataforma. Los tipos y docstrings hacen explícito el contrato, pero no validan por sí solos las entradas de una API.\n\nRepresenta importes con enteros en centavos o un tipo decimal apropiado, y define zona horaria antes de comparar timestamps. No conviertas silenciosamente valores desconocidos en cero: podrías alterar un saldo. Una excepción debe conservar contexto útil; los logs deben registrar lote y etapa sin exponer datos de personas.\n\nLos reintentos sirven para fallos transitorios, no para corregir datos inválidos. Deben tener límite y una operación segura para repetir. En el laboratorio, una transacción de SQLite permite observar el vínculo entre escrituras y checkpoint. Ese mecanismo local enseña una propiedad importante, pero no demuestra tolerancia distribuida ni atomicidad entre servicios independientes.",
+      "exercise": "¿Por qué amount_cents=True debe rechazarse aunque isinstance(True,int) sea verdadero en Python?",
+      "answer": "El contrato requiere un importe entero, no un booleano. type(x) is int distingue este caso; una validación de dominio debe ser más precisa que una conversión implícita.",
+      "steps": [
+        "Ejecuta python pipeline.py dentro de practicas-de.",
+        "Lee validate y añade casos de campo ausente, booleano y fecha imposible.",
+        "Implementa ejercicios/reconstruir.py antes de consultar ingest.",
+        "Divide extracción, validación, transformación y publicación en funciones explicables.",
+        "Ejecuta python -m unittest -v y documenta dos errores que detectaste."
+      ],
+      "accept": "Las 14 pruebas incluidas pasan; tu implementación adicional preserva las versiones más recientes y elimina eventos borrados. Explica cada función sin asistencia.",
+      "refs": [
+        "python",
+        "git"
+      ]
+    },
+    {
+      "id": "DE-R03",
+      "title": "SQL, transacciones y planes de ejecución",
+      "tag": "Base compartida",
+      "hours": 10,
+      "pre": "AE01; F07",
+      "priority": "Núcleo",
+      "goal": "Escribir consultas correctas, comprobar granularidad y comprender una transacción.",
+      "theory": "Una consulta debe comenzar por el significado de una fila. Un join entre dos relaciones uno-a-muchos puede multiplicar importes aunque su sintaxis sea correcta. Agrega cada lado al grano requerido o conserva una tabla de hechos separada. Las funciones de ventana permiten ordenar versiones sin perder el detalle, siempre que definas un desempate estable.\n\nUna transacción agrupa cambios que deben confirmarse o revertirse juntos. Esto no elimina la necesidad de controlar concurrencia ni permite asumir que SQLite y PostgreSQL tienen idéntico aislamiento. Usa parámetros para valores en consultas: concatenar entradas convierte datos en código. Los nombres de objetos requieren validación o composición segura específica.\n\nEXPLAIN permite investigar el plan elegido. Un índice puede mejorar filtros selectivos y penalizar escrituras; en almacenamiento columnar distribuido, particiones y organización de archivos cumplen otras funciones. Compara resultados además de tiempos: una consulta rápida que duplica filas no es una optimización válida.",
+      "exercise": "Una factura tiene tres líneas y dos pagos. ¿Cuántas filas produce unir ambas relaciones por factura?",
+      "answer": "Seis. Para sumar a nivel factura, agrega primero líneas y pagos por separado; no uses DISTINCT como parche sin justificar qué duplicados elimina.",
+      "steps": [
+        "Consulta bronze, silver y quarantine del laboratorio.",
+        "Escribe ROW_NUMBER para elegir versión y compara con la solución Python.",
+        "Introduce un join multiplicativo y demuestra el error con cifras.",
+        "En PostgreSQL de práctica compara EXPLAIN antes y después de un índice.",
+        "Inyecta el fallo del laboratorio y verifica que no avanza el checkpoint."
+      ],
+      "accept": "Resultados SQL y Python coinciden; incluye prueba del join y explica rollback. Registra motor y versión al comparar rendimiento.",
+      "refs": [
+        "postgres",
+        "berkeley",
+        "python"
+      ]
+    },
+    {
+      "id": "DE-R04",
+      "title": "Modelado dimensional, historia y métricas",
+      "tag": "Base compartida",
+      "hours": 10,
+      "pre": "AE02, AE03 y AE06",
+      "priority": "Núcleo",
+      "goal": "Diseñar hechos y dimensiones sin perder historia ni significado de métricas.",
+      "theory": "Un hecho representa un evento o una observación al grano acordado. Un saldo diario y un desembolso no se suman de la misma manera a través del tiempo. El modelo debe expresar unidades, moneda, fecha de negocio y cobertura antes de construir indicadores. Una métrica requiere numerador, denominador, exclusiones y tratamiento de correcciones.\n\nUna dimensión SCD tipo 2 conserva intervalos de vigencia de atributos. No es equivalente a guardar solo la última versión del evento. Un join temporal necesita una convención de intervalos, por ejemplo inicio inclusivo y fin exclusivo, y pruebas para evitar intervalos superpuestos. Para correcciones retroactivas puede ser necesario separar tiempo efectivo y tiempo de conocimiento.\n\nEn crédito, una política vigente al decidir puede diferir de la política actual. En salud, una clasificación puede cambiar después del alta. Conservar estas diferencias hace reproducible un análisis. Tu experiencia con KPIs y reglas de negocio es útil para documentar esas decisiones; la práctica consiste en implementarlas y probarlas.",
+      "exercise": "Un cliente cambia de segmento el 10 de enero. ¿Con qué segmento se clasifica una operación del 8 de enero?",
+      "answer": "Con el segmento vigente el día 8 si la métrica es histórica por vigencia. Usar el actual responde otra pregunta; debe declararse expresamente.",
+      "steps": [
+        "Diseña fact_credit_event y dim_customer_scd2 con claves y grano.",
+        "Crea dos versiones de segmento y un evento antes y después del cambio.",
+        "Implementa join por [valid_from,valid_to).",
+        "Añade prueba de no solapamiento y una sola fila actual.",
+        "Documenta una métrica de aprobación y su denominador."
+      ],
+      "accept": "El join temporal devuelve exactamente una dimensión por hecho; entrega DDL, tres casos límite y diccionario de métricas.",
+      "refs": [
+        "kimball",
+        "postgres"
+      ]
+    },
+    {
+      "id": "DE-R05",
+      "title": "Ingesta incremental, CDC y datos tardíos",
+      "tag": "Ingeniería de Datos",
+      "hours": 12,
+      "pre": "DE-R02 y DE-R03; AE03",
+      "priority": "Núcleo",
+      "goal": "Procesar lotes sin duplicar y distinguir orden de llegada de orden de versión.",
+      "theory": "Ingestar implica identificar qué se leyó, desde dónde y con qué contrato. Un checkpoint registra avance de procesamiento; no demuestra que el dato sea correcto. Un diseño recuperable conserva evidencia de entrada, identifica el lote y confirma su publicación de forma coherente. El cursor de extracción y la versión de una entidad resuelven problemas diferentes.\n\nCDC representa cambios: inserciones, actualizaciones y borrados. Si llega tarde una actualización antigua, no debe reemplazar la versión vigente. Si eliminas físicamente todo rastro de un borrado, un evento anterior puede resucitar la entidad. Un tombstone conserva la versión del borrado para impedirlo. Tampoco basta elegir una fila al azar cuando dos payloads comparten clave y versión: eso es un conflicto del contrato.\n\nUsar MAX(fecha_evento) como único cursor puede perder correcciones antiguas. Evalúa secuencias de origen, fecha de modificación, solapamiento controlado y reconciliación periódica. En el laboratorio el origen entrega lotes contiguos y una versión entera por entidad; son supuestos explícitos, no garantías universales de una API.",
+      "exercise": "Llega B versión 2 DELETE y después B versión 1 UPSERT. ¿Cuál debe ser el estado vigente?",
+      "answer": "B debe seguir borrado. Conserva versión 2 como tombstone y rechaza que una versión inferior cambie el estado.",
+      "steps": [
+        "Ejecuta los tres lotes sintéticos y observa los cambios de A y B.",
+        "Repite cada lote: silver y gold deben permanecer iguales.",
+        "Inyecta un fallo a mitad del lote y comprueba rollback.",
+        "Cambia el contenido de un lote ya confirmado y comprueba rechazo.",
+        "Diseña paginación y cursor para una API simulada con un lote faltante."
+      ],
+      "accept": "A=12000, C=7000 y D=3000 centavos activos; B borrado. Total 22000. Reintentos, lote faltante y payload conflictivo tienen pruebas.",
+      "refs": [
+        "loader",
+        "airflow",
+        "merge"
+      ]
+    },
+    {
+      "id": "DE-R06",
+      "title": "Delta Lake y publicación Bronze–Silver–Gold",
+      "tag": "Ingeniería de Datos",
+      "hours": 12,
+      "pre": "DE-R01, DE-R04 y DE-R05",
+      "priority": "Núcleo",
+      "goal": "Trasladar el contrato local a tablas Delta y verificar publicación repetible.",
+      "theory": "Bronze, Silver y Gold describen responsabilidades, no una garantía automática de calidad. Bronze permite rastrear entradas; Silver resuelve tipos, claves y reglas; Gold ofrece productos al grano del consumidor. Conviene conservar información de origen y transformación para poder investigar diferencias entre capas.\n\nUn MERGE requiere que la fuente esté preparada para identificar cambios inequívocos. Deduplicar por clave y versión es distinto de eliminar filas idénticas. Un orden no determinista puede producir resultados diferentes entre ejecuciones. Conserva el marcador de borrado y condiciona la actualización a una versión posterior cuando ese sea el contrato del origen.\n\nLa atomicidad de una tabla no convierte varias escrituras a distintas tablas en una transacción global. Por eso se necesita una estrategia de publicación y reconciliación antes de exponer resultados parciales. El notebook incluido tiene un caso sintético acotado: crea una fuente de práctica, actualiza estado y comprueba Gold. No implementa SCD2, ingesta de una API real ni coordinación distribuida completa.",
+      "exercise": "¿Por qué el ejemplo conserva op=DELETE en Silver pero lo excluye de Gold?",
+      "answer": "Silver necesita recordar la versión del borrado; Gold expone solo eventos activos. Borrar el tombstone permitiría reinsertar una versión antigua en futuros lotes.",
+      "steps": [
+        "Configura catálogo y schema de práctica en databricks/pipeline_demo.py.",
+        "Ejecuta prepare, transform y quality y conserva salida de reconciliación.",
+        "Repite transform: no deben aumentar filas ni totales.",
+        "Introduce una versión conflictiva y confirma fallo antes de publicar.",
+        "Extiende con un lote tardío y documenta la estrategia de relectura."
+      ],
+      "accept": "Fixture Databricks: total 19000 centavos, A=12000 y C=7000. Este fixture no incluye D del laboratorio local. Conserva evidencia de dos ejecuciones iguales.",
+      "refs": [
+        "merge",
+        "loader",
+        "unity"
+      ]
+    },
+    {
+      "id": "DE-R07",
+      "title": "PySpark y rendimiento con evidencia",
+      "tag": "Ingeniería de Datos",
+      "hours": 12,
+      "pre": "DE-R03 y DE-R06; AE07",
+      "priority": "Núcleo",
+      "goal": "Entender planes, shuffles y particiones sin sustituir medición por intuición.",
+      "theory": "Spark construye un plan y ejecuta transformaciones cuando una acción necesita resultados. Una operación aparentemente pequeña puede mover datos entre ejecutores. Joins, agrupaciones y ordenamientos merecen atención porque pueden producir shuffles y concentrar trabajo en claves frecuentes. La cantidad de filas por sí sola no describe el costo: importan anchura, distribución y número de archivos.\n\nEmpieza por verificar esquema, filtros y columnas necesarias. Después inspecciona el plan y mide una ejecución base. Si una clave domina el volumen, algunas tareas pueden durar mucho más que las demás. Aumentar recursos sin examinar ese sesgo puede esconder el problema sin resolverlo. Un broadcast necesita una relación realmente pequeña y memoria suficiente.\n\nCada experimento debe comparar misma entrada y misma semántica. Cachear solo ayuda cuando se reutiliza una representación y su costo de memoria compensa. Evita collect sobre datasets grandes; el laboratorio usa collect únicamente para una salida Gold diminuta. No extrapoles el tiempo de seis filas a una carga empresarial.",
+      "exercise": "¿Un pipeline con más particiones será siempre más rápido?",
+      "answer": "No. Hay costos de planificación, tareas y archivos pequeños. Se compara el plan, distribución y tiempos con un tamaño de entrada representativo.",
+      "steps": [
+        "Genera al menos 100000 filas sintéticas con una clave dominante.",
+        "Registra plan, duración y distribución de tareas del baseline.",
+        "Compara filtro temprano, proyección de columnas y estrategia de join.",
+        "Verifica equivalencia de resultados con conteos y agregados por clave.",
+        "Entrega un informe de una página con la intervención útil y la que no ayudó."
+      ],
+      "accept": "Informe reproducible con tres ejecuciones por alternativa, configuración y resultado equivalente. No declares una mejora si la variación supera el efecto.",
+      "refs": [
+        "berkeley",
+        "spark",
+        "compute"
+      ]
+    },
+    {
+      "id": "DE-R08",
+      "title": "dbt: modelos, pruebas y semántica",
+      "tag": "Base compartida",
+      "hours": 12,
+      "pre": "DE-R03, DE-R04 y DE-R05",
+      "priority": "Núcleo",
+      "goal": "Construir un DAG analítico versionado y probar supuestos del dato.",
+      "theory": "dbt organiza transformaciones SQL y sus dependencias en un proyecto. Una referencia entre modelos expresa relación de construcción, pero no prueba que el join sea correcto ni que la métrica esté bien definida. Las pruebas deben cubrir claves y también reglas relevantes del negocio.\n\nDistingue pruebas sobre resultados de pruebas unitarias de lógica con entradas controladas. Un modelo puede compilar y devolver datos erróneos. Las pruebas singulares devuelven filas que violan una condición; un resultado vacío representa cumplimiento del supuesto evaluado, no una validación total.\n\nUn modelo incremental guarda estado y exige razonar sobre nuevas filas, correcciones y reconstrucción. Antes de hacerlo incremental, construye una versión completa correcta y compara ambas. La plantilla incluida usa vistas y un seed para facilitar un primer recorrido con PostgreSQL. Convertirla en incremental es un ejercicio posterior: configura unique_key, estrategia compatible y una política explícita de datos tardíos. No copies una estrategia de otro adaptador sin comprobar soporte.",
+      "exercise": "¿Configurar unique_key equivale a validar que la fuente tiene una sola versión vigente por clave?",
+      "answer": "No. La clave guía la materialización compatible, pero la fuente necesita pruebas y preparación. Conserva la prueba de conflictos y verifica unicidad del resultado.",
+      "steps": [
+        "Crea PostgreSQL de práctica y un entorno aislado con adaptador dbt-postgres compatible.",
+        "Configura variables de entorno siguiendo profiles.example.yml.",
+        "Ejecuta dbt debug, dbt seed y dbt build.",
+        "Añade un conflicto de versión al seed y comprueba que no_conflicting_versions falla.",
+        "Implementa una alternativa incremental y compárala contra la reconstrucción completa."
+      ],
+      "accept": "Gold suma 19000 para el fixture dbt; pruebas de unicidad, contrato y conflictos pasan. Entrega manifest y run_results sin credenciales.",
+      "refs": [
+        "dbtinc",
+        "dbttest",
+        "postgres"
+      ]
+    },
+    {
+      "id": "DE-R09",
+      "title": "Lakeflow Jobs: dependencias, reintentos y reparación",
+      "tag": "Ingeniería de Datos",
+      "hours": 12,
+      "pre": "DE-R05 y DE-R06",
+      "priority": "Primera prioridad",
+      "goal": "Operar un DAG que falla de forma diagnosticable y se recupera sin duplicar.",
+      "theory": "Un DAG describe qué tareas pueden comenzar después de otras. No garantiza por sí mismo que las escrituras de una tarea sean seguras para repetir. Cada tarea debe definir entrada, salida, rango temporal y estrategia de publicación. Usa parámetros explícitos para ejecutar un periodo pasado en lugar de depender de la fecha actual.\n\nUn reintento automático conviene ante una interrupción transitoria; una violación de contrato necesita investigar o aislar el dato. Reparar una ejecución permite recuperar tareas fallidas y dependientes según su estado y configuración. La lógica debe tolerar que una tarea vuelva a comenzar después de haber escrito algo.\n\nEl ejemplo prepara, transforma y valida. Para demostrar dominio añade una publicación condicionada a calidad, un fallo controlado y un backfill por fecha. Observa qué tareas se ejecutan y cuáles quedan bloqueadas. No confundas Job exitoso con dato correcto: la última tarea necesita reconciliar el producto que consumirá el usuario.",
+      "exercise": "Transform escribió parte de la salida y falló. ¿Basta pulsar Repair para asegurar que no habrá duplicados?",
+      "answer": "No. Primero verifica idempotencia y estado parcial; la reparación vuelve a ejecutar tareas, pero no corrige automáticamente su semántica de escritura.",
+      "steps": [
+        "Despliega el Job de tres tareas en un entorno de desarrollo compatible.",
+        "Inyecta un fallo controlado y captura el grafo y su causa.",
+        "Corrige, repara y compara con una ejecución limpia.",
+        "Agrega un parámetro de fecha y reproduce un día anterior.",
+        "Documenta reintentos, tiempo límite, notificación y responsable."
+      ],
+      "accept": "La ejecución reparada coincide con el baseline y no duplica datos. Presenta historial, configuración y runbook de recuperación.",
+      "refs": [
+        "jobs",
+        "repair",
+        "airflow"
+      ]
+    },
+    {
+      "id": "DE-R10",
+      "title": "Git, CI/CD y bundles desplegables",
+      "tag": "Ingeniería de Datos",
+      "hours": 12,
+      "pre": "DE-R02, DE-R06 y DE-R09",
+      "priority": "Primera prioridad",
+      "goal": "Versionar código y configuración y separar revisión, pruebas y despliegue.",
+      "theory": "Git registra cambios de código y configuración; el historial solo es útil si los commits explican decisiones y pueden revisarse. Una rama y un pull request permiten discutir alcance y evidencia antes de integrar. No conviertas el repositorio en un almacén de contraseñas ni de datos privados.\n\nIntegración continua comprueba cambios con un entorno definido. Entrega continua prepara una versión desplegable; publicar en un workspace requiere identidad, permisos y parámetros. Los bundles describen recursos junto al código para reducir diferencias manuales entre entornos. Aun así, una validación de configuración no sustituye una prueba de integración ejecutada.\n\nEl paquete incluye databricks.yml para desarrollo y una plantilla de workflow local. Primero haz pasar las pruebas sin nube; después valida el bundle autenticado; finalmente despliega y ejecuta en desarrollo. Promover una versión requiere registrar commit, resultado y configuración. Un rollback de código no revierte automáticamente cambios de datos: diseña por separado recuperación o migración compatible.",
+      "exercise": "¿Volver al commit anterior garantiza recuperar una tabla modificada por la versión nueva?",
+      "answer": "No. Código y estado del dato tienen ciclos distintos. Define compatibilidad, migración y recuperación de datos antes de desplegar cambios destructivos.",
+      "steps": [
+        "Crea rama y un commit con una mejora y una prueba relevante.",
+        "Copia workflow.example.yml a .github/workflows en tu repositorio de práctica.",
+        "Comprueba que un cambio incorrecto hace fallar CI.",
+        "Ejecuta databricks bundle validate -t dev --var catalog=TU_CATALOGO desde databricks/.",
+        "Despliega solo en dev, ejecuta credit_demo y registra commit y salida."
+      ],
+      "accept": "Entrega PR, pruebas locales y evidencia separada de validación y ejecución cloud. La plantilla entregada no equivale a un despliegue ya realizado.",
+      "refs": [
+        "git",
+        "bundles",
+        "cicd"
+      ]
+    },
+    {
+      "id": "DE-R11",
+      "title": "Contratos, calidad y evolución de esquema",
+      "tag": "Base compartida",
+      "hours": 8,
+      "pre": "AE05; DE-R05 y DE-R08",
+      "priority": "Núcleo",
+      "goal": "Proteger consumidores frente a entradas inválidas y cambios incompatibles.",
+      "theory": "Un contrato describe estructura y significado: campos obligatorios, tipos, claves, unidades y reglas. Permitir cualquier nueva columna no resuelve un cambio de significado. Un importe que cambia de centavos a unidades conserva tipo numérico y rompe el producto si nadie lo detecta.\n\nDistingue rechazar el lote, enviar filas a cuarentena y aceptar con advertencia. La política depende del uso: un registro inválido puede bloquear un cálculo financiero aunque otro producto tolere una fracción de rechazo. Conserva causa y procedencia para reparar; una cuarentena sin revisión puede convertirse en pérdida de datos silenciosa.\n\nLas pruebas necesitan casos adversos y reconciliación contra un origen o reconstrucción independiente. Revisar solo que no haya nulos detecta una parte del problema. Para evolucionar un esquema, define versión, compatibilidad, transición y plazo de retiro; prueba tanto al productor como al consumidor.",
+      "exercise": "El origen mantiene amount como número, pero cambia su unidad. ¿Lo detecta una prueba de tipo?",
+      "answer": "No. Añade contrato de unidad, controles de rango y reconciliación con cantidades conocidas; publica una versión compatible o migra consumidores explícitamente.",
+      "steps": [
+        "Escribe contrato de eventos con campos, unidades, claves y UTC.",
+        "Introduce nulos, tipo incorrecto, operación desconocida y unidad alterada.",
+        "Decide qué casos bloquean el lote y cuáles van a cuarentena.",
+        "Diseña versión 2 y una prueba de compatibilidad con el consumidor.",
+        "Define responsable y plazo para resolver cuarentena."
+      ],
+      "accept": "Matriz de casos con resultado esperado y evidencia de detección; cero pérdida silenciosa de entradas rechazadas.",
+      "refs": [
+        "dbttest",
+        "python",
+        "unity"
+      ]
+    },
+    {
+      "id": "DE-R12",
+      "title": "Unity Catalog, permisos y gobierno práctico",
+      "tag": "Ingeniería de Datos",
+      "hours": 8,
+      "pre": "DE-R01 y DE-R11; AE08",
+      "priority": "Núcleo",
+      "goal": "Demostrar acceso mínimo y trazabilidad mediante pruebas positivas y negativas.",
+      "theory": "El gobierno se vuelve verificable cuando roles, activos y permisos corresponden a responsabilidades concretas. Organiza catálogo, schema y tablas de práctica con nombres claros y evita que un consumidor necesite privilegios de administración para consultar un producto.\n\nDiseña una matriz para ingeniero, analista y servicio de ejecución. Para cada rol define lectura, escritura, creación y gestión de permisos. Una prueba positiva muestra que puede hacer su trabajo; una negativa muestra que no puede acceder a datos fuera de su función. Revisa también accesos heredados y permisos del almacenamiento cuando sean aplicables.\n\nEl linaje ayuda a rastrear dependencias, pero no reemplaza definiciones de negocio ni revisión de cambios. En salud y crédito, conserva únicamente datos sintéticos en este programa. La práctica no necesita identidades reales: demuestra el mecanismo con grupos de prueba y registra decisiones, no secretos.",
+      "exercise": "Un analista puede consultar Gold, pero también modificar Silver. ¿Es suficiente que su dashboard funcione?",
+      "answer": "No. El acceso funcional no prueba mínimo privilegio. Elimina permisos innecesarios y comprueba que la consulta autorizada funciona y la escritura no autorizada falla.",
+      "steps": [
+        "Diseña matriz de tres roles y tres capas.",
+        "Configura permisos en objetos de práctica con tu administrador si es necesario.",
+        "Ejecuta consulta permitida y escritura prohibida por rol.",
+        "Identifica linaje de un modelo Gold y sus fuentes.",
+        "Entrega matriz, resultados y procedimiento de revocación."
+      ],
+      "accept": "Pruebas positivas y negativas documentadas; el consumidor consulta Gold sin poder alterar las capas previas. Si no tienes identidades de prueba, marca esta práctica como pendiente.",
+      "refs": [
+        "unity",
+        "git"
+      ]
+    },
+    {
+      "id": "DE-R13",
+      "title": "Observabilidad, SLO y costos",
+      "tag": "Ingeniería de Datos",
+      "hours": 8,
+      "pre": "DE-R07 y DE-R09",
+      "priority": "Núcleo",
+      "goal": "Definir éxito por frescura, corrección y recuperación, además del estado del Job.",
+      "theory": "El estado de ejecución no describe toda la salud de un producto. Un proceso puede terminar sin errores con datos atrasados, incompletos o de volumen inesperado. Define indicadores de frescura, completitud y reconciliación alineados con el uso. Un objetivo debe incluir ventana de medición y población de ejecuciones elegibles.\n\nUna alerta necesita acción: quién recibe el aviso, cómo confirmar impacto y qué procedimiento seguir. Alertar por cada oscilación genera ruido. Separa cambios esperados de incidentes y registra tiempo de detección y recuperación. Un postmortem útil conecta causa, impacto y prevención verificable.\n\nPara costo, mide recursos y resultados comparables. Costo por lote o por millón de filas ayuda a seguir tendencias, siempre que la carga tenga semántica parecida. No publiques precios fijos que dependen de nube, región o contrato. Optimizar costo sacrificando un objetivo de frescura requiere una decisión explícita del producto.",
+      "exercise": "En 30 ejecuciones elegibles, una incumple la frescura. ¿Cuál fue el cumplimiento observado?",
+      "answer": "29/30 = 96.67 %. No equivale al porcentaje de disponibilidad de todos los minutos del mes; depende del denominador definido.",
+      "steps": [
+        "Define dos indicadores con fórmula y una ventana de medición.",
+        "Registra lote, duración, filas, rechazos y checkpoint.",
+        "Simula un lote vacío inesperado y otro atrasado.",
+        "Redacta alerta con responsable y runbook.",
+        "Compara dos configuraciones pequeñas y registra costo observado o estimación con supuestos."
+      ],
+      "accept": "Dashboard o informe distingue Job exitoso de dato válido. Incluye cálculo del SLO, incidente simulado y acción preventiva.",
+      "refs": [
+        "sre",
+        "repair",
+        "compute"
+      ]
+    },
+    {
+      "id": "DE-R14",
+      "title": "Streaming, tiempo de evento y límites de garantías",
+      "tag": "Profundización",
+      "hours": 10,
+      "pre": "AE04 y AE07; DE-R05 y DE-R07",
+      "priority": "Después del núcleo",
+      "goal": "Razonar sobre estado, retrasos y garantías de extremo a extremo.",
+      "theory": "Tiempo de evento y tiempo de procesamiento responden a preguntas diferentes. Un evento puede llegar después de otros más recientes y modificar una ventana histórica. Un watermark permite acotar estado según una política de retraso; no garantiza aceptar para siempre cualquier evento ni mide directamente el reloj de pared.\n\nLa salida depende del modo, las ventanas y la configuración. Una garantía exactamente una vez requiere examinar fuente, procesamiento y destino; no basta con activar un checkpoint. Con una escritura externa en cada microbatch, un reintento puede duplicar si el destino no tiene una clave idempotente.\n\nAntes de elegir streaming, compara la necesidad real de latencia con batch frecuente. Operar estado, checkpoints y eventos tardíos añade complejidad. El laboratorio propuesto utiliza archivos sintéticos y una versión identificada del motor; la simulación local de lotes no demuestra estas garantías distribuidas.",
+      "exercise": "¿Borrar el checkpoint es una forma segura de reparar una consulta streaming?",
+      "answer": "No de forma general. Puede cambiar qué entradas se releen y cómo se reconstruye estado. Define estrategia de recuperación y reconciliación antes de hacerlo.",
+      "steps": [
+        "Genera archivos con event_time ordenado y otros con retraso.",
+        "Configura ventana y watermark compatibles con tu runtime.",
+        "Registra qué eventos afectan cada salida y en qué microbatch.",
+        "Reinicia conservando checkpoint y verifica el destino.",
+        "Compara el resultado con un batch completo y explica diferencias."
+      ],
+      "accept": "Informe de eventos aceptados/tardíos, estado y reinicio. Especifica fuente, destino, versión y alcance de cualquier garantía.",
+      "refs": [
+        "spark",
+        "airflow"
+      ]
+    },
+    {
+      "id": "DE-R15",
+      "title": "Cloud, redes e infraestructura como código",
+      "tag": "Profundización",
+      "hours": 8,
+      "pre": "DE-R01, DE-R10 y DE-R12",
+      "priority": "Después del núcleo",
+      "goal": "Comprender las dependencias cloud necesarias para operar y colaborar con plataforma.",
+      "theory": "Un workspace se apoya en almacenamiento, identidad, red y recursos de ejecución. Poder escribir SQL no implica tener permisos para provisionar infraestructura. Aprende a describir qué dependencia falta y qué equipo puede resolverla. Diferencia autenticación de autorización y rutas de red de permisos sobre objetos.\n\nLa infraestructura como código representa recursos y cambios de forma revisable. Un plan debe examinar alcance, destrucciones, nombres y dependencias antes de aplicar. El estado de la herramienta puede contener información sensible y requiere almacenamiento adecuado. Este programa no despliega cuentas cloud ni redes desde el sitio.\n\nPara un primer puesto técnico prioriza leer una arquitectura, comprender identidades de servicio y diagnosticar acceso. Profundiza después en una nube de acuerdo con las oportunidades que elijas. Aprender tres proveedores superficialmente no sustituye poder explicar uno con un caso reproducible.",
+      "exercise": "El servicio se autentica, pero recibe acceso denegado al leer una tabla. ¿Prueba un fallo de contraseña?",
+      "answer": "No. Revisa autorización sobre catálogo, schema, tabla y almacenamiento aplicable; también el contexto e identidad efectivos.",
+      "steps": [
+        "Escoge una nube y dibuja workspace, storage, identidad y red.",
+        "Describe recorrido de una lectura y puntos de autorización.",
+        "Escribe ADR comparando recurso administrado y configuración propia.",
+        "Revisa un ejemplo oficial de infraestructura y enumera sus permisos.",
+        "Prepara plan de costos y desmontaje sin aplicar recursos desde Atlas."
+      ],
+      "accept": "Diagrama, matriz de responsabilidades y revisión de un plan. No marques despliegue como completado si solo leíste configuración.",
+      "refs": [
+        "compute",
+        "unity",
+        "bundles"
+      ]
+    },
+    {
+      "id": "DE-R16",
+      "title": "Portafolio técnico y defensa de decisiones",
+      "tag": "Base compartida",
+      "hours": 14,
+      "pre": "DE-R01–DE-R13; AE01–AE08",
+      "priority": "Proyecto final",
+      "goal": "Demostrar autonomía con una solución reproducible y una explicación técnica clara.",
+      "theory": "Un repositorio convincente permite a otra persona entender el problema, ejecutar un caso pequeño y comprobar sus resultados. La evidencia incluye decisiones y fallos, no solo una captura de dashboard. El README debe distinguir lo que implementaste de lo que es una extensión propuesta.\n\nConstruye primero un recorrido vertical: entrada sintética, transformación, publicación y validación. Después añade recuperación, historia, permisos y observabilidad. Evita acumular herramientas sin resolver una necesidad: cada pieza debe justificar el costo operativo que introduce.\n\nPara tu perfil, crédito conecta reglas y datos; un segundo caso hospitalario muestra transferencia. En una defensa técnica explica grano, identidad, tiempo, reintentos y publicación. Puedes usar IA para ayudarte, pero necesitas reconocer sus errores y cambiar una parte del sistema sin depender de una respuesta generada. Completar una lista no equivale a experiencia laboral en producción; presenta el proyecto como práctica verificable.",
+      "exercise": "¿Qué demostrarías en diez minutos para sostener que el pipeline es recuperable?",
+      "answer": "Ejecutar baseline, inyectar un fallo, comprobar que no se publicó estado parcial, reintentar y reconciliar contra una reconstrucción. Explicar además límites y recuperación fuera del caso probado.",
+      "steps": [
+        "Completa uno de los dos proyectos integradores indicados abajo.",
+        "Documenta instalación, datos, arquitectura y decisiones con comandos exactos.",
+        "Agrega una modificación de requisitos mediante PR y prueba.",
+        "Graba o ensaya una defensa de diez minutos sin leer el código completo.",
+        "Pide revisión externa y conserva observaciones y correcciones."
+      ],
+      "accept": "Rúbrica ≥80/100 sugerida, ninguna dimensión crítica con cero y ejecución desde entorno limpio. Es una autoevaluación, no certificación externa.",
+      "refs": [
+        "git",
+        "sre",
+        "berkeley"
+      ]
+    }
+  ],
+  "references": {
+    "compute": [
+      "Databricks · selección de cómputo",
+      "https://docs.databricks.com/aws/en/compute/choose-compute",
+      "Documentación oficial; revisar disponibilidad por nube y workspace."
+    ],
+    "python": [
+      "Python · sqlite3",
+      "https://docs.python.org/3/library/sqlite3.html",
+      "Referencia para conexiones, parámetros y transacciones del laboratorio local."
+    ],
+    "postgres": [
+      "PostgreSQL · tutorial",
+      "https://www.postgresql.org/docs/current/tutorial.html",
+      "Joins, claves, transacciones y ventanas; continuar con SQL y EXPLAIN."
+    ],
+    "berkeley": [
+      "UC Berkeley · CS186",
+      "https://cs186berkeley.net/resources/",
+      "Curso de bases de datos y exámenes públicos con soluciones; ampliación académica."
+    ],
+    "kimball": [
+      "Kimball Group · técnicas dimensionales",
+      "https://www.kimballgroup.com/data-warehouse-business-intelligence-resources/kimball-techniques/dimensional-modeling-techniques/",
+      "Granularidad, hechos, dimensiones y tratamiento de historia."
+    ],
+    "loader": [
+      "Databricks · Auto Loader",
+      "https://docs.databricks.com/aws/en/ingestion/cloud-object-storage/auto-loader/",
+      "Ingesta incremental de archivos; contrastar fuentes, esquema y checkpoints."
+    ],
+    "merge": [
+      "Databricks · MERGE en Delta",
+      "https://docs.databricks.com/aws/en/delta/merge",
+      "Actualizaciones, inserciones y borrados; revisar duplicados y versión de runtime."
+    ],
+    "spark": [
+      "Apache Spark · Structured Streaming 3.5.8",
+      "https://spark.apache.org/docs/3.5.8/structured-streaming-programming-guide.html",
+      "Referencia versionada para tiempo de evento, watermarks y estado; adaptar al runtime."
+    ],
+    "dbtinc": [
+      "dbt · modelos incrementales",
+      "https://docs.getdbt.com/docs/build/incremental-models",
+      "Configuración incremental; revisar estrategia y adaptador instalados."
+    ],
+    "dbttest": [
+      "dbt · pruebas de datos",
+      "https://docs.getdbt.com/docs/build/data-tests",
+      "Pruebas genéricas y SQL singular; comprobar compatibilidad de versión."
+    ],
+    "jobs": [
+      "Databricks · configurar Lakeflow Jobs",
+      "https://docs.databricks.com/aws/en/jobs/configure-job",
+      "Dependencias, ejecución y configuración operativa."
+    ],
+    "repair": [
+      "Databricks · reparar Jobs",
+      "https://docs.databricks.com/aws/en/jobs/repair-job-failures",
+      "Diagnóstico y reparación; el reintento no garantiza idempotencia por sí solo."
+    ],
+    "bundles": [
+      "Databricks · Declarative Automation Bundles",
+      "https://docs.databricks.com/aws/en/dev-tools/bundles/",
+      "Versionar y desplegar configuración y código; antes llamados Asset Bundles."
+    ],
+    "cicd": [
+      "Databricks · CI/CD",
+      "https://docs.databricks.com/aws/en/dev-tools/ci-cd",
+      "Separar validación local, integración y despliegue en workspace."
+    ],
+    "git": [
+      "Pro Git · libro abierto",
+      "https://git-scm.com/book/en/v2",
+      "Control de versiones, ramas y colaboración; traducción al español disponible."
+    ],
+    "unity": [
+      "Databricks · Unity Catalog",
+      "https://docs.databricks.com/aws/en/data-governance/unity-catalog/",
+      "Organización y gobierno de activos de datos."
+    ],
+    "sre": [
+      "Google SRE · objetivos de servicio",
+      "https://sre.google/sre-book/service-level-objectives/",
+      "Lectura sobre indicadores, objetivos y acuerdos de servicio."
+    ],
+    "airflow": [
+      "Apache Airflow · buenas prácticas",
+      "https://airflow.apache.org/docs/apache-airflow/stable/best-practices.html",
+      "Tareas repetibles, particiones explícitas y recuperación."
+    ],
+    "exam": [
+      "Databricks · certificación Associate",
+      "https://www.databricks.com/learn/certification/data-engineer-associate",
+      "Mapa de competencias de la certificación; no sustituye práctica de producción."
+    ]
+  }
+}

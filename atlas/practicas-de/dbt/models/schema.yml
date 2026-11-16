@@ -1,0 +1,14 @@
+version: 2
+models:
+  - name: current_events
+    description: Última versión por evento, incluidos tombstones; no equivale a SCD2.
+    columns:
+      - name: event_id
+        data_tests: [unique, not_null]
+      - name: version
+        data_tests: [not_null]
+  - name: daily_credit
+    description: Suma de eventos activos, en centavos y por día del evento.
+    columns:
+      - name: event_day
+        data_tests: [unique, not_null]

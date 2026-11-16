@@ -1,0 +1,10 @@
+name: atlas_de
+version: '1.0.0'
+config-version: 2
+profile: atlas_de
+model-paths: [models]
+seed-paths: [seeds]
+test-paths: [tests]
+models:
+  atlas_de:
+    +materialized: view

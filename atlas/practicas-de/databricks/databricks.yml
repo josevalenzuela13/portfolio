@@ -1,0 +1,47 @@
+# Plantilla de desarrollo. Requiere CLI actual, autenticación y workspace propio.
+# No se ha desplegado ni ejecutado desde Atlas. Solo despliega después de validate.
+bundle:
+  name: atlas-data-engineering-practice
+variables:
+  catalog:
+    description: Catálogo de práctica existente con permisos de escritura
+  schema:
+    default: atlas_practica
+resources:
+  jobs:
+    credit_demo:
+      name: atlas-credit-demo-${bundle.target}
+      max_concurrent_runs: 1
+      tasks:
+        - task_key: prepare
+          notebook_task:
+            notebook_path: ./pipeline_demo.py
+            base_parameters:
+              catalog: ${var.catalog}
+              schema: ${var.schema}
+              stage: prepare
+        - task_key: transform
+          depends_on:
+            - task_key: prepare
+          max_retries: 1
+          notebook_task:
+            notebook_path: ./pipeline_demo.py
+            base_parameters:
+              catalog: ${var.catalog}
+              schema: ${var.schema}
+              stage: transform
+        - task_key: quality
+          depends_on:
+            - task_key: transform
+          notebook_task:
+            notebook_path: ./pipeline_demo.py
+            base_parameters:
+              catalog: ${var.catalog}
+              schema: ${var.schema}
+              stage: quality
+targets:
+  dev:
+    default: true
+    mode: development
+# Las tareas notebook sin cluster usan serverless cuando el workspace lo admite.
+# Si no está disponible, adapta cómputo según la documentación y tus permisos.

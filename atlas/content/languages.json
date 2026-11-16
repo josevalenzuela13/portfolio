@@ -1,0 +1,978 @@
+{
+  "updated": "2026-11-16",
+  "units": [
+    {
+      "id": "EN01",
+      "lang": "en",
+      "title": "Contar tu trayectoria con claridad",
+      "focus": "Presentación profesional · 60–90 segundos",
+      "lesson": "Organiza tu presentación en presente, experiencia relevante y siguiente paso. Una lista de herramientas no explica tu aporte: conecta SQL, modelos y reglas con el problema que ayudaste a resolver. Distingue tu responsabilidad de la del equipo; “supported”, “coordinated” y “implemented” no son intercambiables.\n\nUsa pasado simple para un proyecto terminado y presente perfecto para experiencia sin fecha cerrada. Elige dos hechos verificables de tu CV. Practica con palabras clave y cambia la formulación entre intentos para evitar memorizar un monólogo rígido.",
+      "examples": [
+        [
+          "I work at the intersection of data, business rules and credit decisions.",
+          "Trabajo en la intersección de datos, reglas de negocio y decisiones crediticias."
+        ],
+        [
+          "I have worked across banking, fintech and healthcare.",
+          "He trabajado en banca, fintech y salud."
+        ],
+        [
+          "I helped standardize more than 40 business KPIs.",
+          "Ayudé a estandarizar más de 40 indicadores de negocio."
+        ],
+        [
+          "I am now strengthening my data engineering skills.",
+          "Ahora estoy fortaleciendo mis habilidades de ingeniería de datos."
+        ]
+      ],
+      "task": "Graba fuera del sitio dos presentaciones de 90 segundos. En la segunda, elimina detalles que no expliquen el puesto que buscas.",
+      "evidence": "Incluye función actual, dos evidencias de tu CV y siguiente paso. Pide a alguien que pueda resumir tu perfil sin aclaraciones.",
+      "prompt": "Corrige: I have worked in healthcare in 2022.",
+      "answer": "I worked in healthcare in 2022. Una fecha pasada cerrada pide pasado simple en este caso.",
+      "checks": [
+        [
+          "Completa: I ___ worked across several industries.",
+          [
+            "have"
+          ],
+          "I have worked…: experiencia acumulada sin fecha cerrada."
+        ],
+        [
+          "Completa: Last year, I ___ a reporting project.",
+          [
+            "supported"
+          ],
+          "I supported…: periodo terminado y contribución específica."
+        ]
+      ],
+      "resource": "bc-work"
+    },
+    {
+      "id": "EN02",
+      "lang": "en",
+      "title": "Entrevistas con evidencia y honestidad",
+      "focus": "Respuestas conductuales · STAR",
+      "lesson": "Estructura situación, tarea, acción y resultado, pero dedica más espacio a la acción que al contexto. Explica qué hiciste tú, qué decisión tomaste y cómo verificaste el resultado. Un resultado puede ser una regla documentada o una inconsistencia detectada; no necesitas inventar un porcentaje de mejora.\n\nPrepara preguntas de seguimiento y reconoce límites. Si tu experiencia es de formación, dilo. Puedes describir lo que harías en producción sin presentarlo como algo ya desplegado. Hablar con precisión sobre tus límites resulta más informativo que repetir que sabes todas las herramientas.",
+      "examples": [
+        [
+          "My responsibility was to clarify the business rules.",
+          "Mi responsabilidad era aclarar las reglas de negocio."
+        ],
+        [
+          "I checked the output against the agreed definitions.",
+          "Comprobé el resultado contra las definiciones acordadas."
+        ],
+        [
+          "The team delivered the solution; I focused on the data requirements.",
+          "El equipo entregó la solución; yo me enfoqué en los requisitos de datos."
+        ],
+        [
+          "I have practised this in a project, but not yet in production.",
+          "He practicado esto en un proyecto, pero aún no en producción."
+        ]
+      ],
+      "task": "Prepara tres historias reales: ambigüedad en un KPI, colaboración difícil y un error del que aprendiste. Responde dos preguntas de seguimiento por historia.",
+      "evidence": "Cada historia distingue tu acción y la del equipo; todos los resultados son verificables y puedes explicar cómo se comprobaron.",
+      "prompt": "¿Cómo respondes si te preguntan por una tecnología que no has operado en producción?",
+      "answer": "I have used it in a learning project, but I have not operated it in production yet. I can explain the design and the tests I ran.",
+      "checks": [
+        [
+          "Completa: My responsibility ___ to clarify the requirements.",
+          [
+            "was"
+          ],
+          "Responsabilidad en una situación pasada."
+        ],
+        [
+          "Completa: I have not used it in production ___.",
+          [
+            "yet"
+          ],
+          "Yet encaja con algo que todavía no ha ocurrido."
+        ]
+      ],
+      "resource": "bc-listen"
+    },
+    {
+      "id": "EN03",
+      "lang": "en",
+      "title": "Explicar pipelines y decisiones técnicas",
+      "focus": "Secuencia · causa · alternativas",
+      "lesson": "Para explicar arquitectura, empieza por el consumidor y la necesidad. Describe fuente, transformación y salida; después introduce la decisión técnica y su alternativa. Usa conectores que hagan visible el razonamiento: “because”, “therefore”, “whereas” y “however”. No los uses como adorno: cada uno expresa una relación distinta.\n\nDistingue precisión de jerga. Define idempotencia con una consecuencia observable: repetir el mismo lote no añade duplicados. Explica qué comprueba una prueba y qué deja fuera. Practica la misma explicación para un ingeniero y para alguien de negocio.",
+      "examples": [
+        [
+          "The pipeline reads new files and validates the incoming records.",
+          "El pipeline lee archivos nuevos y valida los registros entrantes."
+        ],
+        [
+          "We keep the deletion marker so that an older event cannot restore the record.",
+          "Conservamos el marcador de borrado para impedir que un evento anterior restaure el registro."
+        ],
+        [
+          "I chose a batch approach because the report is updated daily.",
+          "Elegí procesamiento por lotes porque el informe se actualiza diariamente."
+        ],
+        [
+          "The trade-off is lower complexity at the cost of higher latency.",
+          "La contrapartida es menor complejidad a costa de mayor latencia."
+        ]
+      ],
+      "task": "Explica durante dos minutos el pipeline de la ruta de Ingeniería de Datos. Haz otra versión de 45 segundos para un stakeholder no técnico.",
+      "evidence": "Defines una decisión, una alternativa, un supuesto y un límite. Otra persona entiende qué ocurre si llega un duplicado.",
+      "prompt": "Explica idempotencia sin utilizar la palabra “idempotent”.",
+      "answer": "If we process the same batch again, the final data stays the same and no duplicate records are added.",
+      "checks": [
+        [
+          "Completa: We validate the data ___ publishing it.",
+          [
+            "before"
+          ],
+          "Before indica la secuencia de validación y publicación."
+        ],
+        [
+          "Completa: I chose batch processing ___ the report is updated daily.",
+          [
+            "because"
+          ],
+          "Because introduce la razón."
+        ]
+      ],
+      "resource": "bc-write"
+    },
+    {
+      "id": "EN04",
+      "lang": "en",
+      "title": "Participar en reuniones sin quedarte callado",
+      "focus": "Aclarar · discrepar · resumir acuerdos",
+      "lesson": "Participar no exige responder rápido a todo. Puedes comprobar una definición, pedir un ejemplo o resumir una decisión. Practica frases de entrada cortas para no esperar a tener una explicación perfecta. Si no entendiste, señala exactamente qué parte necesita aclaración.\n\nAl discrepar, identifica la preocupación y propone una comprobación. En vez de una oposición vaga, plantea qué dato cambiaría tu opinión. Termina con responsable y siguiente paso. Esto conecta con tu experiencia de traducir requisitos: la claridad de una pregunta puede evitar una implementación equivocada.",
+      "examples": [
+        [
+          "Could you clarify what counts as an approved application?",
+          "¿Podrías aclarar qué cuenta como solicitud aprobada?"
+        ],
+        [
+          "If I understand correctly, the metric excludes cancelled applications.",
+          "Si entiendo bien, la métrica excluye solicitudes canceladas."
+        ],
+        [
+          "My concern is that this join could duplicate the amounts.",
+          "Me preocupa que este join pueda duplicar los importes."
+        ],
+        [
+          "Let us confirm the definition before changing the model.",
+          "Confirmemos la definición antes de cambiar el modelo."
+        ]
+      ],
+      "task": "Simula una reunión de cinco minutos sobre una métrica ambigua. Haz dos preguntas, presenta una objeción y cierra con el acuerdo.",
+      "evidence": "El cierre especifica definición, responsable y siguiente paso. Puedes pedir aclaración sin abandonar la conversación.",
+      "prompt": "Convierte “I do not understand” en una pregunta específica sobre fecha de la métrica.",
+      "answer": "Could you clarify whether the metric uses the application date or the approval date?",
+      "checks": [
+        [
+          "Completa: Could you ___ the definition?",
+          [
+            "clarify"
+          ],
+          "Clarify = aclarar."
+        ],
+        [
+          "Completa: My concern ___ that the totals may be duplicated.",
+          [
+            "is"
+          ],
+          "My concern is that… introduce una preocupación concreta."
+        ]
+      ],
+      "resource": "bc-work"
+    },
+    {
+      "id": "EN05",
+      "lang": "en",
+      "title": "Escribir correos y actualizaciones útiles",
+      "focus": "Resultado · impacto · petición",
+      "lesson": "Un mensaje profesional suele necesitar objetivo, contexto mínimo y acción. Empieza por el resultado o bloqueo; añade evidencia y di qué necesitas del destinatario. Distingue una fecha comprometida de una estimación. Evita expresiones largas que oculten la petición.\n\nEscribe primero una versión breve y revisa si contiene actor, acción y plazo. Después comprueba tiempos verbales y tono. Un texto formal no necesita sonar distante. No envíes automáticamente los borradores de esta práctica: trabaja con nombres y datos ficticios.",
+      "examples": [
+        [
+          "The validation is complete, and the results match the source totals.",
+          "La validación terminó y los resultados coinciden con los totales de origen."
+        ],
+        [
+          "We are waiting for confirmation of the business definition.",
+          "Esperamos confirmación de la definición de negocio."
+        ],
+        [
+          "Could you review the proposed definition by Friday?",
+          "¿Podrías revisar la definición propuesta antes del viernes?"
+        ],
+        [
+          "I will send an update once the checks are complete.",
+          "Enviaré una actualización cuando terminen las comprobaciones."
+        ]
+      ],
+      "task": "Escribe un correo de 100 palabras: un informe está bloqueado por una definición pendiente. Luego redúcelo a 60 sin perder la petición.",
+      "evidence": "El lector puede identificar qué está listo, qué falta, quién debe actuar y cuándo. Revisa claridad antes de revisar estilo.",
+      "prompt": "Reescribe: I am writing this email in order to ask you if you could possibly check the definition.",
+      "answer": "Could you review the definition? Añade objeto y plazo cuando sean relevantes.",
+      "checks": [
+        [
+          "Completa: The results are consistent ___ the source data.",
+          [
+            "with"
+          ],
+          "Consistent with es la combinación habitual."
+        ],
+        [
+          "Completa: Could you review this ___ Friday?",
+          [
+            "by"
+          ],
+          "By Friday establece un plazo límite."
+        ]
+      ],
+      "resource": "bc-write"
+    },
+    {
+      "id": "EN06",
+      "lang": "en",
+      "title": "Escuchar, tomar notas y responder",
+      "focus": "Comprensión antes de transcripción",
+      "lesson": "La comprensión útil consiste en extraer idea, evidencia, postura y acción, no en reconocer cada palabra. Escucha una vez para captar propósito y otra para localizar detalles. Usa la transcripción después de producir tus notas; así podrás distinguir un problema de vocabulario de uno de segmentación del habla.\n\nSelecciona un fragmento de 30–60 segundos y practica shadowing tras entenderlo. No persigas un acento idéntico: busca ritmo inteligible, agrupación de ideas y énfasis. Para evaluar tu resumen, compara contenido y relaciones lógicas con el original.",
+      "examples": [
+        [
+          "The speaker argues that the main issue is data quality.",
+          "La persona sostiene que el problema principal es la calidad del dato."
+        ],
+        [
+          "The example supports the argument, but it does not prove causation.",
+          "El ejemplo apoya el argumento, pero no demuestra causalidad."
+        ],
+        [
+          "I missed the last point. Could you repeat it?",
+          "No capté el último punto. ¿Podrías repetirlo?"
+        ],
+        [
+          "The next step is to agree on a shared definition.",
+          "El siguiente paso es acordar una definición compartida."
+        ]
+      ],
+      "task": "Elige una escucha C1 de la fuente enlazada. Anota idea, dos detalles y acción; consulta transcripción y corrige el resumen.",
+      "evidence": "Conservas primer intento y revisión. Identificas tres expresiones que no reconociste al escucharlas, aunque sí conocías por escrito.",
+      "prompt": "¿Qué diferencia hay entre no conocer una palabra y no reconocerla al escucharla?",
+      "answer": "El primer caso pide aprender significado y uso; el segundo requiere trabajar sonido, enlace y contexto con un modelo audible.",
+      "checks": [
+        [
+          "Completa: Could you ___ the last point?",
+          [
+            "repeat"
+          ],
+          "Repeat solicita que se repita una parte."
+        ],
+        [
+          "Completa: The speaker provides two ___ to support the claim.",
+          [
+            "examples"
+          ],
+          "Examples = ejemplos; respalda sin afirmar prueba causal."
+        ]
+      ],
+      "resource": "bc-listen"
+    },
+    {
+      "id": "EN07",
+      "lang": "en",
+      "title": "Precisión gramatical y lenguaje natural",
+      "focus": "Errores frecuentes · colocaciones",
+      "lesson": "Lleva un registro breve de errores que realmente cometes. Clasifica tiempo verbal, preposición, elección de palabra y orden; corrige un patrón por semana. Una regla es útil cuando puedes reutilizarla en tres situaciones nuevas, no solo reconocer la respuesta de un ejercicio.\n\nDespués de “can” se usa la forma base: “I cannot believe it”. “Experience”, “information” y “advice” suelen ser incontables en estos usos: “some advice”, no “an advice”. Aprende colocaciones completas como “responsible for”, “experience with” y “apply for a role”. La revisión debe preservar tu voz y no convertir todo en frases genéricas.",
+      "examples": [
+        [
+          "I still cannot believe it.",
+          "Todavía no puedo creerlo."
+        ],
+        [
+          "I am responsible for coordinating the reporting work.",
+          "Soy responsable de coordinar el trabajo de reporting."
+        ],
+        [
+          "I have experience with Databricks.",
+          "Tengo experiencia con Databricks."
+        ],
+        [
+          "I would like some advice on my next step.",
+          "Me gustaría recibir orientación sobre mi siguiente paso."
+        ]
+      ],
+      "task": "Reúne diez frases tuyas de práctica, corrígelas y escribe una frase nueva por cada patrón. Vuelve a producirlas al día siguiente sin mirar.",
+      "evidence": "Puedes justificar cinco correcciones y reutilizarlas en mensajes nuevos. No dependes únicamente de una corrección automática.",
+      "prompt": "Corrige: I can not believed it. / I need an advice.",
+      "answer": "I cannot believe it. / I need some advice. Después de can va la forma base; advice es incontable en este uso.",
+      "checks": [
+        [
+          "Completa: I still cannot ___ it.",
+          [
+            "believe"
+          ],
+          "Después de cannot se usa believe, no believed."
+        ],
+        [
+          "Completa: I am responsible ___ data quality checks.",
+          [
+            "for"
+          ],
+          "Responsible for + sustantivo o forma -ing."
+        ]
+      ],
+      "resource": "bc-write"
+    },
+    {
+      "id": "EN08",
+      "lang": "en",
+      "title": "Defensa técnica y conversación espontánea",
+      "focus": "Integración · revisión externa",
+      "lesson": "Combina presentación, explicación técnica, escucha y preguntas inesperadas. Hablar bien sobre una respuesta preparada no demuestra que puedas sostener una conversación. Pide a un compañero que cambie un requisito, cuestione una decisión o solicite una explicación más simple.\n\nMide progreso con muestras comparables: misma tarea al inicio y al final, tiempo disponible parecido y una rúbrica de claridad, precisión, interacción e inteligibilidad. La rapidez por sí sola no representa fluidez. Una revisión externa ayuda a detectar errores que ya no notas. El sitio organiza práctica; no asigna nivel CEFR ni sustituye evaluación de un docente.",
+      "examples": [
+        [
+          "That is a fair question. Let me explain the assumption first.",
+          "Es una pregunta válida. Primero explicaré el supuesto."
+        ],
+        [
+          "I would need to check that before giving a reliable answer.",
+          "Necesitaría comprobarlo antes de dar una respuesta fiable."
+        ],
+        [
+          "If the latency requirement changed, I would reconsider the design.",
+          "Si cambiara el requisito de latencia, reconsideraría el diseño."
+        ],
+        [
+          "What would success look like in the first three months?",
+          "¿Cómo se definiría el éxito durante los primeros tres meses?"
+        ]
+      ],
+      "task": "Realiza una entrevista simulada de 15 minutos: presentación, proyecto, incidente y preguntas propias. Pide tres observaciones concretas.",
+      "evidence": "Repites el diagnóstico de EN01, mejoras dos aspectos identificados y conservas una lista breve de próximos objetivos.",
+      "prompt": "¿Qué respondes si necesitas comprobar un detalle técnico?",
+      "answer": "I would need to check the runtime documentation before confirming that behaviour. Reconoce el límite y especifica qué comprobarías.",
+      "checks": [
+        [
+          "Completa: If the requirements changed, I ___ reconsider the design.",
+          [
+            "would"
+          ],
+          "Hipótesis: if + pasado, would + forma base."
+        ],
+        [
+          "Completa: Let me ___ the assumption first.",
+          [
+            "explain"
+          ],
+          "Let me + forma base."
+        ]
+      ],
+      "resource": "bc-listen"
+    },
+    {
+      "id": "DEU01",
+      "lang": "de",
+      "title": "Sonidos, alfabeto y primeras frases",
+      "focus": "Inicio desde cero · escuchar y deletrear",
+      "lesson": "Escucha el alfabeto alemán y practica tu nombre letra por letra. Las combinaciones no se leen como en español: “ei” suele sonar parecido a “ai”, “ie” representa una i larga y “eu/äu” se aproximan a “oi”. Son ayudas iniciales, no transcripciones exactas. Escucha ejemplos nativos para ä, ö, ü y las variantes de ch; no reemplaces sistemáticamente esos sonidos por vocales españolas.\n\nLos sustantivos se escriben con mayúscula. Aprende una palabra con su artículo y plural cuando corresponda. Empieza por frases útiles para pedir repetición: te permiten participar incluso cuando tu vocabulario es pequeño.",
+      "examples": [
+        [
+          "Hallo! Guten Tag!",
+          "¡Hola! ¡Buen día!"
+        ],
+        [
+          "Wie schreibt man das?",
+          "¿Cómo se escribe eso?"
+        ],
+        [
+          "Können Sie das bitte wiederholen?",
+          "¿Puede repetirlo, por favor?"
+        ],
+        [
+          "Ich lerne Deutsch.",
+          "Estoy aprendiendo alemán."
+        ]
+      ],
+      "task": "Escucha un modelo de alfabeto en Goethe. Deletrea Andrés y cinco palabras; repite tres frases sin mirar el texto.",
+      "evidence": "Puedes deletrear tu nombre y pedir repetición. Compara tu voz con un modelo nativo; las aproximaciones españolas no bastan para evaluar pronunciación.",
+      "prompt": "Traduce: Estoy aprendiendo alemán.",
+      "answer": "Ich lerne Deutsch.",
+      "checks": [
+        [
+          "Completa: Ich lerne ___.",
+          [
+            "Deutsch"
+          ],
+          "Deutsch designa el idioma y se escribe con mayúscula."
+        ],
+        [
+          "Completa: Guten ___! (buen día)",
+          [
+            "Tag"
+          ],
+          "Guten Tag es un saludo cortés."
+        ]
+      ],
+      "resource": "goethe"
+    },
+    {
+      "id": "DEU02",
+      "lang": "de",
+      "title": "Presentarte y decir de dónde eres",
+      "focus": "sein · heißen · kommen",
+      "lesson": "En una oración declarativa principal sencilla el verbo conjugado ocupa la segunda posición. “Ich komme aus Guatemala” empieza con sujeto; “Heute lerne ich Deutsch” empieza con un complemento y coloca el sujeto después del verbo. Segunda posición no significa segunda palabra.\n\nAprende los pares ich bin / du bist / Sie sind, ich heiße / du heißt / Sie heißen. Sie con mayúscula es trato formal. Para procedencia usa “aus”; Guatemala puede aparecer sin artículo en estas frases. Practica pregunta y respuesta juntas para no quedarte solo con afirmaciones memorizadas.",
+      "examples": [
+        [
+          "Ich heiße Andrés.",
+          "Me llamo Andrés."
+        ],
+        [
+          "Ich komme aus Guatemala.",
+          "Soy de Guatemala."
+        ],
+        [
+          "Ich bin Ingenieur.",
+          "Soy ingeniero."
+        ],
+        [
+          "Wie heißen Sie? Woher kommen Sie?",
+          "¿Cómo se llama? ¿De dónde es?"
+        ]
+      ],
+      "task": "Presenta nombre, procedencia, profesión e idiomas en 30 segundos. Responde también en trato formal.",
+      "evidence": "Produces cuatro frases comprensibles y reconoces las preguntas equivalentes sin traducir palabra por palabra.",
+      "prompt": "Ordena: aus Guatemala / komme / ich.",
+      "answer": "Ich komme aus Guatemala.",
+      "checks": [
+        [
+          "Completa: Ich ___ Andrés. (me llamo)",
+          [
+            "heiße",
+            "heisse"
+          ],
+          "Heiße; heisse se acepta como alternativa de teclado."
+        ],
+        [
+          "Completa: Ich komme ___ Guatemala.",
+          [
+            "aus"
+          ],
+          "Aus expresa procedencia en este caso."
+        ]
+      ],
+      "resource": "dw"
+    },
+    {
+      "id": "DEU03",
+      "lang": "de",
+      "title": "Preguntas, verbos regulares y trato formal",
+      "focus": "ich, du, Sie · W-Fragen",
+      "lesson": "Muchos verbos regulares parten del infinitivo menos -en y usan terminaciones: ich lerne, du lernst, wir lernen, Sie lernen. Algunos verbos presentan cambios o ajustes; no conviertas el patrón en una regla sin excepciones. Aprende cada verbo con una frase.\n\nEn preguntas con palabra interrogativa, esta va primero y el verbo conjugado después: “Wo wohnen Sie?”. En preguntas sí/no, el verbo va al inicio: “Sprechen Sie Englisch?”. Distingue wo (dónde) y woher (de dónde). Practica siempre cambiar también la conjugación cuando cambies el pronombre.",
+      "examples": [
+        [
+          "Wo wohnen Sie?",
+          "¿Dónde vive?"
+        ],
+        [
+          "Ich wohne in Guatemala-Stadt.",
+          "Vivo en Ciudad de Guatemala."
+        ],
+        [
+          "Sprechen Sie Englisch?",
+          "¿Habla inglés?"
+        ],
+        [
+          "Ja, ich spreche Spanisch und Englisch.",
+          "Sí, hablo español e inglés."
+        ]
+      ],
+      "task": "Construye un diálogo de ocho turnos con nombre, residencia e idiomas. Alterna du y Sie sin mezclar conjugaciones.",
+      "evidence": "Puedes hacer cuatro preguntas y responderlas. Identificas por qué “Sprechen Sie…?” comienza con verbo.",
+      "prompt": "Ordena: Sie / Englisch / sprechen / ?.",
+      "answer": "Sprechen Sie Englisch?",
+      "checks": [
+        [
+          "Completa: Wo ___ Sie? (vivir)",
+          [
+            "wohnen"
+          ],
+          "Sie formal usa wohnen."
+        ],
+        [
+          "Completa: Ich ___ Deutsch. (aprender)",
+          [
+            "lerne"
+          ],
+          "Ich + lerne."
+        ]
+      ],
+      "resource": "vhs"
+    },
+    {
+      "id": "DEU04",
+      "lang": "de",
+      "title": "Artículos, plurales y objetos cotidianos",
+      "focus": "der, die, das · ein, eine",
+      "lesson": "El género gramatical no se deduce de forma fiable del significado. Aprende der Termin, die Wohnung y das Zimmer como unidades, junto con sus plurales: Termine, Wohnungen y Zimmer. El artículo definido plural es die. Los patrones ayudan, pero no reemplazan aprender el sustantivo completo.\n\nEn nominativo usa ein para masculino y neutro y eine para femenino. “Das ist…” presenta algo; “Ich habe…” introduce una estructura que requiere acusativo y cambia el masculino a einen. Primero reconoce las diferencias en frases cortas antes de memorizar tablas extensas.",
+      "examples": [
+        [
+          "Das ist ein Termin.",
+          "Eso es una cita."
+        ],
+        [
+          "Das ist eine Wohnung.",
+          "Eso es una vivienda."
+        ],
+        [
+          "Das ist ein Zimmer.",
+          "Eso es una habitación."
+        ],
+        [
+          "Die Termine sind am Montag.",
+          "Las citas son el lunes."
+        ]
+      ],
+      "task": "Aprende diez objetos o lugares con artículo y plural. Describe cinco con “Das ist…” y comprueba el artículo.",
+      "evidence": "Recuerdas al menos ocho de los diez con artículo; corriges los restantes y los vuelves a recuperar otro día.",
+      "prompt": "Completa el artículo de Wohnung y su plural.",
+      "answer": "die Wohnung; die Wohnungen.",
+      "checks": [
+        [
+          "Completa: Das ist ___ Wohnung.",
+          [
+            "eine"
+          ],
+          "Wohnung es femenino: eine."
+        ],
+        [
+          "Completa: ___ Zimmer (la habitación).",
+          [
+            "das"
+          ],
+          "Das Zimmer es neutro."
+        ]
+      ],
+      "resource": "vhs"
+    },
+    {
+      "id": "DEU05",
+      "lang": "de",
+      "title": "Números, precios, fechas y horas",
+      "focus": "Datos cotidianos · entender antes de responder",
+      "lesson": "Practica primero 0–20 y las decenas. En 21–99 normalmente se dice unidad + und + decena: einundzwanzig. No inviertas automáticamente el orden al escribir cifras. Para precios escucha euros y centavos; repite para confirmar antes de actuar.\n\nPara empezar usa hora formal: “um neun Uhr” y “um vierzehn Uhr dreißig”. Las expresiones coloquiales, como halb zehn, requieren atención: significan las nueve y media. Aprende am Montag y um neun Uhr como combinaciones. Usa números ficticios para practicar datos personales.",
+      "examples": [
+        [
+          "Der Termin ist am Montag um neun Uhr.",
+          "La cita es el lunes a las nueve."
+        ],
+        [
+          "Das kostet zwölf Euro.",
+          "Eso cuesta doce euros."
+        ],
+        [
+          "einundzwanzig",
+          "veintiuno"
+        ],
+        [
+          "Können Sie die Nummer bitte wiederholen?",
+          "¿Puede repetir el número, por favor?"
+        ]
+      ],
+      "task": "Escucha y escribe diez números. Simula tres citas y confirma día y hora en voz alta.",
+      "evidence": "Aciertas ocho números y confirmas las tres citas; repasa lo que confundiste. Usa hora formal antes de añadir expresiones coloquiales.",
+      "prompt": "¿Qué hora expresa halb zehn?",
+      "answer": "Las nueve y media: media hora antes de las diez.",
+      "checks": [
+        [
+          "Completa: Der Termin ist ___ Montag.",
+          [
+            "am"
+          ],
+          "Am + día de la semana."
+        ],
+        [
+          "Completa: Der Termin ist ___ neun Uhr.",
+          [
+            "um"
+          ],
+          "Um + hora."
+        ]
+      ],
+      "resource": "vhs"
+    },
+    {
+      "id": "DEU06",
+      "lang": "de",
+      "title": "Pedir algo y expresar necesidades",
+      "focus": "haben · möchten · acusativo inicial",
+      "lesson": "“Ich möchte…” permite pedir de forma cortés. Si hay otro verbo, el infinitivo suele ir al final: “Ich möchte einen Termin vereinbaren”. Aprende también “Ich brauche…” y “Ich habe…”. En estas frases los objetos directos se construyen en acusativo.\n\nEl cambio más visible al empezar es masculino: ein Termin pasa a einen Termin. Femenino y neutro mantienen aquí eine Wohnung y ein Zimmer. Practica con objetos concretos. Para profesiones con sein, como “Ich bin Ingenieur”, esta no es la misma estructura de objeto directo.",
+      "examples": [
+        [
+          "Ich möchte einen Kaffee, bitte.",
+          "Quisiera un café, por favor."
+        ],
+        [
+          "Ich brauche einen Termin.",
+          "Necesito una cita."
+        ],
+        [
+          "Ich habe eine Frage.",
+          "Tengo una pregunta."
+        ],
+        [
+          "Ich möchte Deutsch lernen.",
+          "Quisiera aprender alemán."
+        ]
+      ],
+      "task": "Simula cafetería y recepción: dos peticiones por contexto y una pregunta de aclaración.",
+      "evidence": "Usas möchten con cortesía y distingues ein/einen en dos ejemplos masculinos.",
+      "prompt": "Completa: Ich brauche ___ Termin.",
+      "answer": "Ich brauche einen Termin.",
+      "checks": [
+        [
+          "Completa: Ich ___ eine Frage.",
+          [
+            "habe"
+          ],
+          "Ich habe = tengo."
+        ],
+        [
+          "Completa: Ich möchte einen Kaffee, ___.",
+          [
+            "bitte"
+          ],
+          "Bitte = por favor."
+        ]
+      ],
+      "resource": "vhs"
+    },
+    {
+      "id": "DEU07",
+      "lang": "de",
+      "title": "Negación y preferencias",
+      "focus": "nicht · kein · gern",
+      "lesson": "Kein niega un sustantivo que en la afirmación tendría artículo indefinido o ninguno: “Ich habe kein Auto”. Cambia según género y caso: “keine Zeit”, “keinen Termin”. Nicht niega otras partes de la oración; su posición depende del foco. Empieza con modelos completos y cambia un elemento cada vez.\n\nGern expresa que disfrutas hacer algo: “Ich lese gern”. Mögen expresa gusto por algo; en esta etapa no necesitas dominar todas sus conjugaciones para comunicar una preferencia. Negar una frase no debe destruir su orden básico ni la conjugación.",
+      "examples": [
+        [
+          "Ich habe kein Auto.",
+          "No tengo coche."
+        ],
+        [
+          "Ich habe heute keine Zeit.",
+          "Hoy no tengo tiempo."
+        ],
+        [
+          "Ich spreche noch nicht gut Deutsch.",
+          "Todavía no hablo bien alemán."
+        ],
+        [
+          "Ich lese gern.",
+          "Me gusta leer."
+        ]
+      ],
+      "task": "Escribe cuatro frases afirmativas y sus negativas. Añade dos gustos y una actividad que no disfrutas.",
+      "evidence": "Explicas por qué usaste kein en un ejemplo y nicht en otro; revisa el orden con un modelo.",
+      "prompt": "Niega: Ich habe ein Auto.",
+      "answer": "Ich habe kein Auto.",
+      "checks": [
+        [
+          "Completa: Ich habe ___ Zeit.",
+          [
+            "keine"
+          ],
+          "Die Zeit: keine Zeit."
+        ],
+        [
+          "Completa: Ich lese ___. (me gusta leer)",
+          [
+            "gern",
+            "gerne"
+          ],
+          "Gern/gerne expresa gusto por la actividad."
+        ]
+      ],
+      "resource": "goethe"
+    },
+    {
+      "id": "DEU08",
+      "lang": "de",
+      "title": "Rutina y verbos separables",
+      "focus": "Tiempo · posición del verbo",
+      "lesson": "Describe hábitos con verbos frecuentes: arbeiten, lernen, lesen y beginnen. Algunos son irregulares; aprende una forma útil y amplía después. Si empiezas con un complemento de tiempo, el verbo principal sigue en segunda posición: “Am Abend lerne ich Deutsch”.\n\nLos verbos separables como aufstehen separan el prefijo en estas oraciones: “Ich stehe um sieben Uhr auf”. Con un modal, el infinitivo queda junto al final: “Ich muss früh aufstehen”. Practica escuchar el final de la frase para no perder la información del prefijo.",
+      "examples": [
+        [
+          "Ich arbeite mit Daten.",
+          "Trabajo con datos."
+        ],
+        [
+          "Am Abend lerne ich Deutsch.",
+          "Por la noche estudio alemán."
+        ],
+        [
+          "Ich stehe um sieben Uhr auf.",
+          "Me levanto a las siete."
+        ],
+        [
+          "Am Wochenende lese ich gern.",
+          "El fin de semana me gusta leer."
+        ]
+      ],
+      "task": "Describe un día en seis frases y cambia dos de ellas para empezar por la hora o el momento del día.",
+      "evidence": "Mantienes el verbo conjugado en segunda posición y colocas el prefijo separable al final en el ejemplo practicado.",
+      "prompt": "Ordena: am Abend / Deutsch / ich / lerne.",
+      "answer": "Am Abend lerne ich Deutsch.",
+      "checks": [
+        [
+          "Completa: Ich stehe um sieben Uhr ___.",
+          [
+            "auf"
+          ],
+          "Aufstehen separa auf en esta oración."
+        ],
+        [
+          "Completa: Am Abend ___ ich Deutsch.",
+          [
+            "lerne"
+          ],
+          "El verbo va antes del sujeto cuando inicia Am Abend."
+        ]
+      ],
+      "resource": "vhs"
+    },
+    {
+      "id": "DEU09",
+      "lang": "de",
+      "title": "Moverte, preguntar y orientarte",
+      "focus": "Direcciones · transporte · ayuda",
+      "lesson": "Prioriza frases que permiten localizar un lugar y confirmar una indicación. Wo pregunta por ubicación y wohin por destino. No traduzcas cada preposición desde español: aprende secuencias como “zum Bahnhof” y revisa su estructura al avanzar.\n\nEn el nivel inicial puedes usar instrucciones y respuestas breves: links, rechts, geradeaus. Cuando no entiendas, pide que hablen más despacio. Reconocer esas palabras en un mapa es distinto de entenderlas al oído: combina ambas prácticas.",
+      "examples": [
+        [
+          "Entschuldigung, wo ist der Bahnhof?",
+          "Disculpe, ¿dónde está la estación?"
+        ],
+        [
+          "Gehen Sie geradeaus und dann nach links.",
+          "Siga recto y después a la izquierda."
+        ],
+        [
+          "Ich möchte zum Bahnhof.",
+          "Quiero ir a la estación."
+        ],
+        [
+          "Bitte sprechen Sie langsamer.",
+          "Por favor, hable más despacio."
+        ]
+      ],
+      "task": "Dibuja un mapa pequeño y pide instrucciones para dos destinos. Escucha una respuesta sin mirar el mapa y verifica la ruta.",
+      "evidence": "Distingues izquierda/derecha/recto y puedes pedir repetición si te pierdes.",
+      "prompt": "Traduce: Disculpe, ¿dónde está la estación?",
+      "answer": "Entschuldigung, wo ist der Bahnhof?",
+      "checks": [
+        [
+          "Completa: Wo ist der ___? (estación)",
+          [
+            "Bahnhof"
+          ],
+          "Der Bahnhof."
+        ],
+        [
+          "Completa: Bitte sprechen Sie ___. (más despacio)",
+          [
+            "langsamer"
+          ],
+          "Langsamer = más despacio."
+        ]
+      ],
+      "resource": "goethe"
+    },
+    {
+      "id": "DEU10",
+      "lang": "de",
+      "title": "Vivienda, citas y comunicación cortés",
+      "focus": "Mensajes breves · datos esenciales",
+      "lesson": "Un mensaje inicial necesita saludo, motivo, datos relevantes y petición. Usa oraciones cortas y revisa verbo, artículo y mayúsculas. Para buscar vivienda puedes empezar con “Ich suche ein Zimmer” y preguntar por precio o visita; no necesitas una carta compleja.\n\nAprende expresiones como “Ich habe einen Termin” y “Ich kann am Montag kommen”. La cortesía también depende de contexto, tono y tratamiento. En estas prácticas usa información ficticia: el objetivo es construir un mensaje comprensible, no completar un trámite real.",
+      "examples": [
+        [
+          "Ich suche ein Zimmer.",
+          "Busco una habitación."
+        ],
+        [
+          "Wie hoch ist die Miete?",
+          "¿De cuánto es el alquiler?"
+        ],
+        [
+          "Ist das Zimmer noch frei?",
+          "¿Sigue disponible la habitación?"
+        ],
+        [
+          "Kann ich am Montag kommen?",
+          "¿Puedo venir el lunes?"
+        ]
+      ],
+      "task": "Escribe un mensaje de cinco frases para preguntar por una habitación y una posible visita. Revisa con los modelos.",
+      "evidence": "El mensaje indica interés, pregunta por disponibilidad y propone un momento; mantiene trato cortés y orden básico.",
+      "prompt": "Escribe una pregunta para saber si una habitación sigue disponible.",
+      "answer": "Ist das Zimmer noch frei?",
+      "checks": [
+        [
+          "Completa: Ich suche ___ Zimmer.",
+          [
+            "ein"
+          ],
+          "Zimmer es neutro; aquí ein."
+        ],
+        [
+          "Completa: Ist das Zimmer noch ___?",
+          [
+            "frei"
+          ],
+          "Frei = libre/disponible en este contexto."
+        ]
+      ],
+      "resource": "goethe-a1"
+    },
+    {
+      "id": "DEU11",
+      "lang": "de",
+      "title": "Hablar de trabajo, estudio y capacidades",
+      "focus": "können · müssen · infinitivo al final",
+      "lesson": "Los modales como können y müssen se conjugan y suelen colocar el otro verbo en infinitivo al final: “Ich kann Englisch sprechen”. Aprende ich kann / Sie können y ich muss / Sie müssen con ejemplos cortos. La negación de müssen no equivale a prohibición: “nicht müssen” expresa no tener obligación.\n\nPara tu perfil basta empezar diciendo profesión, área e interés de estudio. No intentes traducir un CV técnico entero en A1. La meta es una presentación breve que puedas sostener y comprender cuando alguien te haga preguntas sencillas.",
+      "examples": [
+        [
+          "Ich bin Ingenieur und arbeite mit Daten.",
+          "Soy ingeniero y trabajo con datos."
+        ],
+        [
+          "Ich möchte in Deutschland studieren.",
+          "Quisiera estudiar en Alemania."
+        ],
+        [
+          "Ich kann Englisch sprechen.",
+          "Puedo hablar inglés."
+        ],
+        [
+          "Ich muss heute arbeiten.",
+          "Tengo que trabajar hoy."
+        ]
+      ],
+      "task": "Presenta tu trabajo en cinco frases sencillas. Añade una capacidad y algo que necesitas aprender.",
+      "evidence": "Conjugas el modal y dejas el infinitivo al final en tres ejemplos. Puedes explicar que se trata de una presentación inicial.",
+      "prompt": "Ordena: Englisch / kann / sprechen / ich.",
+      "answer": "Ich kann Englisch sprechen.",
+      "checks": [
+        [
+          "Completa: Ich ___ Englisch sprechen. (puedo)",
+          [
+            "kann"
+          ],
+          "Ich kann + infinitivo al final."
+        ],
+        [
+          "Completa: Ich muss heute ___. (trabajar)",
+          [
+            "arbeiten"
+          ],
+          "El verbo principal queda en infinitivo al final."
+        ]
+      ],
+      "resource": "vhs"
+    },
+    {
+      "id": "DEU12",
+      "lang": "de",
+      "title": "Integración y siguiente paso hacia A1",
+      "focus": "Conversación inicial · lectura · escucha · escritura",
+      "lesson": "Integra lo aprendido en situaciones breves: presentarte, preguntar una hora, pedir algo y escribir un mensaje. No confundas reconocer una frase con poder producirla y entender una respuesta nueva. Alterna cambios pequeños de persona, fecha, cantidad y lugar para comprobar transferencia.\n\nA1 incluye más contenidos y práctica de lo que cabe en estas doce unidades. Usa el curso externo para ampliar temas y los materiales oficiales para detectar brechas. La autoevaluación del sitio no asigna nivel. Una revisión con docente o interlocutor competente ayuda especialmente con pronunciación e interacción.",
+      "examples": [
+        [
+          "Ich heiße Andrés und komme aus Guatemala.",
+          "Me llamo Andrés y soy de Guatemala."
+        ],
+        [
+          "Ich arbeite mit Daten und lerne Deutsch.",
+          "Trabajo con datos y estudio alemán."
+        ],
+        [
+          "Können Sie mir bitte helfen?",
+          "¿Puede ayudarme, por favor?"
+        ],
+        [
+          "Vielen Dank für Ihre Hilfe.",
+          "Muchas gracias por su ayuda."
+        ]
+      ],
+      "task": "Haz una conversación de tres minutos y escribe un mensaje de 40–60 palabras. Luego prueba una sección de escucha A1 oficial y registra dificultades.",
+      "evidence": "Puedes iniciar, pedir aclaración y cerrar una conversación breve. Conserva correcciones y selecciona los siguientes temas con un curso completo.",
+      "prompt": "¿Qué falta para afirmar que completaste un nivel A1?",
+      "answer": "Una evaluación más amplia de comprensión, producción e interacción. Marcar doce unidades aquí no demuestra por sí solo ese nivel.",
+      "checks": [
+        [
+          "Completa: Vielen ___ für Ihre Hilfe.",
+          [
+            "Dank"
+          ],
+          "Vielen Dank = muchas gracias."
+        ],
+        [
+          "Completa: Können Sie mir bitte ___? (ayudar)",
+          [
+            "helfen"
+          ],
+          "Können + infinitivo helfen."
+        ]
+      ],
+      "resource": "goethe-a1"
+    }
+  ],
+  "resources": [
+    {
+      "id": "bc-listen",
+      "lang": "en",
+      "title": "British Council · C1 Listening",
+      "url": "https://learnenglish.britishcouncil.org/free-resources/listening/c1",
+      "use": "Escucha entrevistas, reuniones y charlas; responde primero sin transcripción y compara después."
+    },
+    {
+      "id": "bc-write",
+      "lang": "en",
+      "title": "British Council · C1 Writing",
+      "url": "https://learnenglish.britishcouncil.org/free-resources/writing/c1",
+      "use": "Estudia la estructura de un texto modelo y escribe después una versión con tu propio caso."
+    },
+    {
+      "id": "bc-work",
+      "lang": "en",
+      "title": "British Council · Podcasts for professionals",
+      "url": "https://learnenglish.britishcouncil.org/free-resources/business/podcasts-professionals",
+      "use": "Refuerzo B2 de escucha profesional con transcripciones y ejercicios; sirve como puente si una actividad C1 resulta muy difícil."
+    },
+    {
+      "id": "goethe",
+      "lang": "de",
+      "title": "Goethe-Institut · Practicar alemán",
+      "url": "https://www.goethe.de/en/spr/ueb.html",
+      "use": "Busca alfabeto, presentación personal y ejercicios de nivel inicial; escucha el modelo antes de imitarlo."
+    },
+    {
+      "id": "goethe-a1",
+      "lang": "de",
+      "title": "Goethe-Institut · Material de práctica A1",
+      "url": "https://www.goethe.de/en/spr/prf/ueb/pa1.html",
+      "use": "Más adelante, contrasta comprensión, lectura, escritura y conversación con los modelos oficiales. Completar Atlas no equivale a aprobar el examen."
+    },
+    {
+      "id": "vhs",
+      "lang": "de",
+      "title": "vhs-Lernportal · A1",
+      "url": "https://a1.vhs-lernportal.de/",
+      "use": "Curso externo para ampliar y practicar de forma sistemática. La información del proveedor indica uso gratuito; algunas funciones requieren registro propio."
+    },
+    {
+      "id": "dw",
+      "lang": "de",
+      "title": "Deutsche Welle · Nicos Weg, episodio inicial",
+      "url": "https://www.youtube.com/watch?v=dC6ZGLzdaTs",
+      "use": "Vídeo oficial para comenzar con saludos. Mira un fragmento corto, anota lo que reconoces y repite después con el modelo."
+    }
+  ]
+}

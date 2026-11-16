@@ -54,3 +54,20 @@ El progreso se guarda por navegador/dominio; exportación e importación permite
 trasladarlo. No se envía a GitHub ni implica acreditación de competencias.
 Las pruebas locales fueron ejecutadas; Databricks/dbt requieren ejecución y
 validación adicionales en entornos configurados por el estudiante.
+
+## Idiomas: inglés profesional y alemán desde cero
+
+- `idiomas.html`: 8 unidades de consolidación de inglés y 12 introductorias de
+  alemán, 80 tarjetas, 40 comprobaciones cortas, temporizador y cuaderno local.
+- `cuaderno-idiomas.md`: material descargable con tareas y modelos originales.
+- `content/build_languages.py` y `content/languages.json`: fuente y datos.
+
+```bash
+python content/build_languages.py
+```
+
+El generador se reaplica tras reconstruir el programa y la ruta DE. Las voces
+son síntesis opcional del navegador: requieren una voz compatible y no evalúan
+pronunciación. Las notas y borradores se conservan por dominio/navegador y pueden
+exportarse/importarse; no se envían a GitHub. El sitio no graba ni pide micrófono.
+Las actividades son práctica de autoestudio y no acreditan un nivel CEFR.
